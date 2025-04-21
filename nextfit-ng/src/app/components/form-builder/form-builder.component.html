@@ -1,0 +1,89 @@
+<div class="flex items-center justify-between">
+    <h2 class="text-3xl font-bold text-primary">{{ pageTitle }}</h2>
+    <p-select (onChange)="loadFormConfig()" [options]="options" [(ngModel)]="planLevel" placeholder="Select a Type" class="w-full md:w-56"></p-select>
+</div>
+
+<p-fluid *ngIf="config">
+    <div *ngIf="!loading; else loadingTemplate">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-8">
+            <ng-container *ngFor="let section of config; let i = index">
+                <p-panel class="shadow-xl rounded-xl overflow-hidden">
+                    <ng-template #header>
+                        <div class="flex items-center gap-2 p-2">
+                            <span class="text-xl font-semibold">{{ section.label }}</span>
+                            <i *ngIf="section.description" class="pi pi-question-circle opacity-80 cursor-pointer" [pTooltip]="section.description" tooltipPosition="right"></i>
+                        </div>
+                    </ng-template>
+                    <div class="grid gap-6 p-5" [class]="section.size ? 'md:grid-cols-' + section.size : 'md:grid-cols-2'">
+                        <ng-container *ngFor="let field of section.fields">
+                            <div [class]="field.width ? 'md:col-span-' + field.width : ''">
+                                <ng-container *ngIf="isFieldVisible(field)">
+                                    <app-field
+                                        [id]="field.fieldName"
+                                        [formGroup]="form"
+                                        [controlName]="field.fieldName"
+                                        [label]="field.fieldLabel"
+                                        [type]="field.fieldType"
+                                        [validators]="field.validators"
+                                        [placeholder]="field.placeholder"
+                                        [required]="field.required"
+                                        [options]="field.options || []"
+                                        [min]="field.min"
+                                        [max]="field.max"
+                                        [step]="field.step"
+                                        [suffix]="field.suffix"
+                                        [groupAddons]="field.groupAddons"
+                                    ></app-field>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                    </div>
+                </p-panel>
+
+                <br />
+            </ng-container>
+
+            <!-- Navigation Buttons -->
+            <div class="flex items-center gap-4 justify-end p-5">
+                <button [fluid]="false" pButton pRipple type="button" label="Cancel" class="p-button-secondary shadow-md hover:shadow-lg transition-transform hover:-translate-y-0.5"></button>
+                <button
+                    [fluid]="false"
+                    pButton
+                    pRipple
+                    type="button"
+                    label="Submit"
+                    icon="pi pi-check"
+                    iconPos="right"
+                    (click)="onSubmit()"
+                    [disabled]="isLoading$ | async"
+                    class="p-button-primary shadow-md hover:shadow-lg transition-transform hover:-translate-y-0.5"
+                ></button>
+            </div>
+        </form>
+    </div>
+</p-fluid>
+
+<ng-template #loadingTemplate>
+    <div class="loading-container">
+        <p-progressSpinner></p-progressSpinner>
+        <p>Loading form...</p>
+    </div>
+</ng-template>
+
+<p-toast />
+
+<p-confirmdialog #cd>
+    <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
+        <div class="flex flex-col items-center p-8 bg-surface-0 dark:bg-surface-900 rounded">
+            <div class="rounded-full bg-primary text-primary-contrast inline-flex justify-center items-center h-24 w-24 -mt-20">
+                <i class="pi pi-question !text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-6">{{ message.header }}</span>
+            <p class="mb-0">{{ message.message }}</p>
+            <div class="flex items-center gap-2 mt-6">
+                <p-button label="Save" (onClick)="onAccept()" styleClass="w-32"></p-button>
+                <p-button label="Cancel" [outlined]="true" (onClick)="onReject()" styleClass="w-32"></p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmdialog>

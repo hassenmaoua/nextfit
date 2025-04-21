@@ -1,0 +1,145 @@
+<div [formGroup]="formGroup" class="field">
+    <label [for]="id" [ngClass]="{ required: required }">
+        {{ label }}
+    </label>
+
+    <ng-container [ngSwitch]="type">
+        <!-- Multi Select -->
+        <div *ngSwitchCase="'multiSelect'" [id]="controlName">
+            <p-autoComplete
+                [formControlName]="controlName"
+                [multiple]="true"
+                [dropdown]="true"
+                [suggestions]="suggestions"
+                (completeMethod)="search($event)"
+                [placeholder]="placeholder"
+                [disabled]="disabled"
+                class="w-full"
+                [ngClass]="{ 'ng-invalid ng-dirty': control.invalid && (control.dirty || control.touched) }"
+            >
+            </p-autoComplete>
+        </div>
+
+        <!-- Selection Button -->
+        <p-selectButton [id]="controlName" *ngSwitchCase="'selectButton'" [options]="options || []" [formControlName]="controlName" optionLabel="label" optionValue="value" [disabled]="disabled" />
+
+        <!-- Number Input -->
+        <p-inputNumber
+            *ngSwitchCase="'number'"
+            [id]="controlName"
+            [formControlName]="controlName"
+            [placeholder]="placeholder || ''"
+            [min]="min"
+            [max]="max"
+            [step]="step || '1'"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            [disabled]="disabled"
+            [suffix]="suffix"
+            [ngClass]="{
+                'ng-invalid ng-dirty': control.invalid && (control.dirty || control.touched)
+            }"
+        >
+            <ng-template #incrementbuttonicon>
+                <span class="pi pi-plus"></span>
+            </ng-template>
+            <ng-template #decrementbuttonicon>
+                <span class="pi pi-minus"></span>
+            </ng-template>
+            <ng-container *ngFor="let add of groupAddons">
+                <p-inputGroupAddon *ngIf="add.position == 'end'">{{ add.value }}</p-inputGroupAddon>
+            </ng-container>
+        </p-inputNumber>
+
+        <!-- Select Dropdown -->
+        <p-dropdown *ngSwitchCase="'select'" [id]="controlName" [options]="options" [formControlName]="controlName" [placeholder]="placeholder || 'Select'" optionLabel="label" optionValue="value" [showClear]="true" [disabled]="disabled"></p-dropdown>
+
+        <!-- Time picker -->
+        <p-datepicker
+            *ngSwitchCase="'time'"
+            [id]="controlName"
+            [formControlName]="controlName"
+            [placeholder]="placeholder || '00:00'"
+            [hourFormat]="'12'"
+            [iconDisplay]="'input'"
+            [showIcon]="true"
+            [timeOnly]="true"
+            inputId="templatedisplay"
+            [showOnFocus]="false"
+        >
+            <ng-template #inputicon let-clickCallBack="clickCallBack">
+                <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
+            </ng-template>
+        </p-datepicker>
+
+        <p-inputGroup>
+            <ng-container *ngFor="let add of groupAddons">
+                <p-inputGroupAddon *ngIf="add.position == 'start'">{{ add.value }}</p-inputGroupAddon>
+            </ng-container>
+
+            <!-- Text Input -->
+            <input
+                *ngSwitchCase="'text'"
+                pInputText
+                [id]="controlName"
+                type="text"
+                [formControlName]="controlName"
+                [attr.placeholder]="placeholder || ''"
+                [disabled]="disabled"
+                [ngClass]="{
+                    'ng-invalid ng-dirty': control.invalid && (control.dirty || control.touched)
+                }"
+            />
+
+            <!-- Checkbox -->
+            <div *ngSwitchCase="'checkbox'">
+                <ng-container *ngFor="let opt of options">
+                    <p-checkbox [id]="opt.label" [value]="opt.value" [binary]="true" [id]="controlName" [formControlName]="controlName" [disabled]="disabled"></p-checkbox>
+                    <label [for]="opt.label">{{ opt.label }}</label>
+                </ng-container>
+            </div>
+
+            <!-- Radio Input -->
+            <div *ngSwitchCase="'radio'" [id]="controlName" class="flex flex-wrap gap-3 mt-2">
+                <div class="flex items-center" *ngFor="let btn of options">
+                    <p-radioButton [id]="btn.label" [name]="controlName" [value]="btn.value" [formControlName]="controlName" [disabled]="disabled" />
+                    <label [for]="btn.label" class="ml-2">{{ btn.label }}</label>
+                </div>
+            </div>
+
+            <!-- Textarea -->
+            <textarea
+                *ngSwitchCase="'textarea'"
+                pTextarea
+                [id]="controlName"
+                [formControlName]="controlName"
+                [attr.placeholder]="placeholder || ''"
+                [rows]="3"
+                [disabled]="disabled"
+                [ngClass]="{
+                    'ng-invalid ng-dirty': control.invalid && (control.dirty || control.touched)
+                }"
+            ></textarea>
+
+            <!-- Range Slider -->
+            <p-slider *ngSwitchCase="'range'" [id]="controlName" [formControlName]="controlName" [min]="min || 0" [max]="max || 100" [step]="step || 1"></p-slider>
+
+            <!-- Default fallback -->
+            <div *ngSwitchDefault>
+                <p class="text-muted">Unsupported field type: {{ type }}</p>
+            </div>
+
+            <ng-container *ngFor="let add of groupAddons">
+                <p-inputGroupAddon *ngIf="add.position == 'end'">{{ add.value }}</p-inputGroupAddon>
+            </ng-container>
+        </p-inputGroup>
+
+        <small class="p-error" *ngIf="control.invalid && (control.dirty || control.touched)">
+            <div *ngFor="let validator of validators || []">
+                <span *ngIf="control.hasError(validator.type)">
+                    {{ validator.message }}
+                </span>
+            </div>
+        </small>
+    </ng-container>
+</div>

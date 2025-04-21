@@ -1,0 +1,122 @@
+::ng-deep .p-timeline-event-opposite {
+    width: 6rem !important;
+    flex: none !important;
+}
+.headline {
+    background: var(--surface-card);
+    border-radius: 5px;
+    padding: 1rem;
+}
+
+/* Override Tree empty message */
+::ng-deep .p-tree-empty-message {
+    padding: 1rem;
+    color: var(--secondary-500); // Use your theme variable
+    font-style: italic;
+
+    // Dark mode support
+    .app-dark & {
+        color: var(--secondary-300);
+    }
+}
+
+::ng-deep .p-tree-root {
+    margin-top: 1rem;
+}
+
+.parent-node {
+    background: var(--primary-color);
+    color: var(--primary-text);
+}
+
+.parent-node:hover {
+    background: var(--primary-darker);
+}
+
+.empty-parent-node {
+    background: var(--primary-color);
+    color: var(--primary-text);
+    cursor: default !important;
+}
+
+.children-node {
+    background: var(--secondary-color);
+}
+
+.children-node:hover {
+    background: var(--secondary-darker);
+}
+
+.leaf-node {
+    background-color: var(--surface-50);
+    border-left: 3px solid var(--secondary-400);
+}
+
+.leaf-node:hover {
+    border-left: 3px solid var(--primary-color);
+}
+
+/* Icon styles */
+.pi-circle {
+    color: var(--text-color-secondary);
+}
+
+.text-primary {
+    color: var(--primary-color);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.workout-task {
+    border-left: 3px solid #3b82f6;
+}
+
+.nutrition-task {
+    border-left: 3px solid #10b981;
+}
+
+.selected {
+    opacity: 0.7;
+    text-decoration: line-through;
+    border-left: 3px solid var(--primary-color);
+}
+
+.plan-container {
+    padding: 1rem;
+    background: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+    .subtitle {
+        font-style: italic;
+        color: #666;
+    }
+
+    .weekly-schedule {
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        background: #fff;
+        border-left: 4px solid #3f51b5;
+        border-radius: 8px;
+
+        h4 {
+            color: #3f51b5;
+            margin-top: 1rem;
+        }
+
+        ul {
+            list-style: square;
+            margin-left: 1.5rem;
+        }
+
+        .meal {
+            margin-bottom: 0.75rem;
+        }
+    }
+}
+
+// ::ng-deep .p-panel-content {
+//     padding: 0 !important;
+// }

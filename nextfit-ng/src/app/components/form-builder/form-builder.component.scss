@@ -1,0 +1,56 @@
+:host {
+    display: block;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    gap: 1rem;
+}
+
+.ng-invalid.ng-dirty {
+    border-color: var(--red-500) !important;
+}
+
+.card {
+    background: var(--surface-card);
+    border-radius: 10px;
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 1.5rem;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+        font-weight: 500;
+        color: var(--text-color);
+    }
+}
+
+.p-inputtext,
+.p-inputnumber,
+.p-chips,
+.p-multiselect,
+.p-dropdown,
+.p-inputtextarea {
+    width: 100%;
+}
+
+.p-radiobutton-label,
+.p-checkbox-label {
+    margin-left: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr !important;
+    }
+}

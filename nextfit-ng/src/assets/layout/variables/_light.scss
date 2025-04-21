@@ -1,0 +1,19 @@
+:root {
+    --surface-ground: var(--p-surface-100);
+    --code-background: var(--p-surface-900);
+    --code-color: var(--p-surface-200);
+
+    --primary-darker: var(--p-primary-600); // Slightly darker in light mode
+    --primary-lighter: var(--p-primary-100); // Softer light variant
+    --secondary-color: var(--p-primary-200);
+    --secondary-darker: var(--p-primary-300);
+    --secondary-lighter: var(--p-primary-100);
+
+    --sidebar-bg: #ffffff;
+    --sidebar-text-color: #1e293b;
+    --menu-hover-bg: var(--p-primary-50);
+    --menu-active-bg: var(--p-primary-50);
+    --menu-badge-bg: #fde047;
+    --menu-badge-color: #1e293b;
+    --menu-lock-color: #dc2626;
+}

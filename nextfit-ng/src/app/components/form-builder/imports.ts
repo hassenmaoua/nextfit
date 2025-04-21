@@ -1,0 +1,12 @@
+import { ButtonModule } from 'primeng/button';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { FluidModule } from 'primeng/fluid';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ToastModule } from 'primeng/toast';
+import { PanelModule } from 'primeng/panel';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { TooltipModule } from 'primeng/tooltip';
+import { SelectModule } from 'primeng/select';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+export default [ButtonModule, CommonModule, FluidModule, FormsModule, ReactiveFormsModule, PanelModule, ProgressSpinner, TooltipModule, ToastModule, SelectModule, ConfirmDialog];

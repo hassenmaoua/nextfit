@@ -1,0 +1,22 @@
+:root[class*='app-dark'] {
+    --surface-ground: var(--p-surface-950);
+    --code-background: var(--p-surface-800);
+    --code-color: var(--p-surface-100);
+
+    --primary-darker: var(--p-primary-800); // Deeper dark primary
+    --primary-lighter: var(--p-primary-300); // Brighter for contrast
+    --secondary-color: var(--secondary-600);
+    --secondary-darker: var(--secondary-700);
+    --secondary-lighter: var(--secondary-500);
+
+    --secondary-50: #0f172a;
+    --secondary-100: #1e293b;
+    --secondary-200: #334155;
+    --secondary-300: #475569;
+    --secondary-400: #64748b;
+    --secondary-500: #94a3b8;
+    --secondary-600: #cbd5e1;
+    --secondary-700: #e2e8f0;
+    --secondary-800: #f1f5f9;
+    --secondary-900: #f8fafc;
+}

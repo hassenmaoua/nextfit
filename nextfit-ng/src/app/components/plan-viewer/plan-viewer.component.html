@@ -1,0 +1,180 @@
+<p-toast />
+<!-- Loading State -->
+<div *ngIf="loading">
+    <div class="headline">
+        <div class="flex items-start">
+            <h3 class="text-2xl font-bold m-0 me-2"><p-skeleton height="3rem" width="500px" styleClass="mb-2" /></h3>
+        </div>
+        <div class="mb-2 text-xl">
+            <p-skeleton height="1rem" width="400px" styleClass="mb-2" />
+        </div>
+        <p-skeleton height="1rem" width="400px" styleClass="mb-2" />
+    </div>
+
+    <ng-container class="mb-5">
+        <p-divider />
+        <p-panel [toggleable]="true">
+            <ng-template #header>
+                <div class="flex flex-col items-start gap-2 p-2">
+                    <span class="text-xl font-bold"><p-skeleton height="1.5rem" width="400px" styleClass="mb-2" /></span>
+                    <p-skeleton height="1rem" width="300px" styleClass="mb-2" />
+                </div>
+            </ng-template>
+
+            <ng-template #icons>
+                <p-button icon="pi pi-cog" severity="secondary" rounded text disabled="true" />
+            </ng-template>
+
+            <p-table [value]="[1, 2, 3, 4, 5]">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th><p-skeleton width="80%"></p-skeleton></th>
+                        <th><p-skeleton width="70%"></p-skeleton></th>
+                        <th><p-skeleton width="60%"></p-skeleton></th>
+                        <th><p-skeleton width="50%"></p-skeleton></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-row>
+                    <tr>
+                        <td><p-skeleton width="100%" height="1.25rem"></p-skeleton></td>
+                        <td><p-skeleton width="80%" height="1.25rem"></p-skeleton></td>
+                        <td><p-skeleton width="70%" height="1.25rem"></p-skeleton></td>
+                        <td><p-skeleton width="60%" height="1.25rem"></p-skeleton></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            <p-skeleton width="100" styleClass="mr-2" />
+        </p-panel>
+    </ng-container>
+</div>
+
+<!-- Plan Content -->
+<ng-container *ngIf="plan && !loading">
+    <!-- Headline Section -->
+    <div class="bg-slate-100 dark:bg-gradient-to-br dark:from-slate-800 dark:to-slate-950 text-slate-900 dark:text-white rounded-2xl shadow-lg p-6 mb-8 transition-all">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <h3 class="text-2xl md:text-3xl font-bold">{{ plan.headline }}</h3>
+            <p-tag [value]="plan.level" class="bg-blue-500 text-white dark:bg-blue-400 rounded-full px-3 py-1 text-sm shadow-md" />
+        </div>
+        <div class="text-lg md:text-xl text-slate-700 dark:text-slate-300 mb-2">
+            {{ plan.subtitle }}
+        </div>
+        <div class="text-sm md:text-lg text-slate-600 dark:text-slate-400"><strong class="text-slate-900 dark:text-white">Plan Concept:</strong> {{ plan.planConcept }}</div>
+    </div>
+
+    <div class="mb-5" *ngFor="let week of plan.weeklySchedules; index as i">
+        <p-panel [toggleable]="true" styleClass="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 dark:backdrop-blur-lg shadow-md overflow-hidden">
+            <ng-template #header>
+                <div class="flex flex-col gap-1 p-4">
+                    <strong class="text-lg sm:text-2xl">{{ week.headline }}</strong>
+                    <span class="text-sm opacity-80"><strong>Goal:</strong> {{ week.subtitle }}</span>
+                </div>
+            </ng-template>
+
+            <!-- Workouts -->
+            <ng-container *ngIf="isBasicPlan(week)">
+                <ng-container *ngTemplateOutlet="basicTemplate; context: { week }"></ng-container>
+            </ng-container>
+
+            <!-- Meals -->
+            <ng-container *ngIf="isMealPlan(week)">
+                <ng-container *ngTemplateOutlet="mealTemplate; context: { week }"></ng-container>
+            </ng-container>
+
+            <!-- Dual -->
+            <ng-container *ngIf="isDualPlan(week) || isPremiumPlan(week)">
+                <p-splitter styleClass="mt-4">
+                    <ng-template #panel>
+                        <ng-container *ngTemplateOutlet="basicTemplate; context: { week }"></ng-container>
+                    </ng-template>
+                    <ng-template #panel>
+                        <ng-container *ngTemplateOutlet="mealTemplate; context: { week }"></ng-container>
+                    </ng-template>
+                </p-splitter>
+            </ng-container>
+
+            <!-- Nutrition -->
+            <ng-container *ngIf="isNutritionPlan(week) || isPremiumPlan(week)">
+                <ng-container *ngTemplateOutlet="nutritionTemplate; context: { week }"></ng-container>
+            </ng-container>
+        </p-panel>
+    </div>
+</ng-container>
+
+<ng-template #mealTemplate let-week="week">
+    <p-scrollpanel [style]="{ width: '100%', 'max-height': '40rem' }">
+        <p-accordion [value]="0" class="rounded-xl overflow-hidden mt-4">
+            @for (tab of week.diets; track tab.day; let idx = $index, e = $even) {
+                <p-accordion-panel [value]="idx" styleClass="bg-slate-50 dark:bg-white/5 dark:backdrop-blur-xl border-b border-slate-200 dark:border-white/10">
+                    <p-accordion-header class="text-slate-800 dark:text-white text-base sm:text-lg font-semibold px-4 py-2">
+                        {{ tab.day }}
+                    </p-accordion-header>
+                    <p-accordion-content>
+                        <div class="mb-5">
+                            <strong>{{ tab.headline }}</strong>
+                            <p>{{ tab.subtitle }}</p>
+                        </div>
+                        <p-timeline [value]="tab.meals">
+                            <ng-template #opposite let-meal>
+                                <small class="text-slate-500 dark:text-slate-400">{{ meal.time }}</small>
+                            </ng-template>
+                            <ng-template #content let-meal>
+                                <div>
+                                    <strong>{{ meal.mealType }}</strong>
+                                    <p class="text-slate-500 dark:text-slate-300">{{ meal.mealDescription }}</p>
+                                </div>
+                            </ng-template>
+                        </p-timeline>
+                    </p-accordion-content>
+                </p-accordion-panel>
+            }
+        </p-accordion>
+    </p-scrollpanel>
+</ng-template>
+
+<ng-template #basicTemplate let-week="week">
+    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-white/10">
+        <p-table [value]="week.workouts" scrollHeight="40rem" class="min-w-[600px] w-full text-slate-800 dark:text-white" rowGroupMode="subheader" groupRowsBy="day" [customSort]="true" [tableStyle]="{ 'min-width': '30rem' }">
+            <ng-template #header>
+                <tr class="text-slate-800 dark:text-white">
+                    <th style="width: 2rem"><p-tableHeaderCheckbox /></th>
+                    <th>Focus</th>
+                    <th>Exercise</th>
+                    <th>Description</th>
+                </tr>
+            </ng-template>
+            <ng-template #groupheader let-workout>
+                <tr pRowGroupHeader class="bg-slate-50 dark:bg-slate-900">
+                    <td colspan="4" class="py-2 px-4 font-bold">
+                        {{ workout.headline }}
+                        <span class="text-slate-500 dark:text-slate-300 font-normal ml-2">{{ workout.subtitle }}</span>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template #body let-workout>
+                <tr *ngFor="let exercise of workout.exercises" class="hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <td><p-tableCheckbox [value]="exercise" /></td>
+                    <td>{{ exercise.focus }}</td>
+                    <td>{{ exercise.name }}</td>
+                    <td>{{ exercise.description }}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</ng-template>
+
+<ng-template #nutritionTemplate let-week="week">
+    <div class="bg-slate-100 dark:bg-white/5 dark:backdrop-blur-xl text-slate-800 dark:text-white p-6 rounded-xl mt-4 shadow-sm">
+        <h4 class="text-lg font-semibold mb-2">Nutrition Guidelines</h4>
+        <p class="mb-1"><strong>Intakes:</strong> {{ week.nutrition.intakes }}</p>
+        <p class="mb-1"><strong>Meals:</strong> {{ week.nutrition.meals }}</p>
+        <p class="mb-1"><strong>Hydration:</strong> {{ week.nutrition.hydration }}</p>
+        <ul class="list-disc pl-6 mb-2 text-slate-700 dark:text-slate-300">
+            <li *ngFor="let guideline of week.nutrition.guidelines">{{ guideline }}</li>
+        </ul>
+        <p class="mt-2"><strong>Supplements:</strong></p>
+        <ul class="list-disc pl-6 text-slate-700 dark:text-slate-300">
+            <li *ngFor="let supplement of week.nutrition.supplements">{{ supplement }}</li>
+        </ul>
+    </div>
+</ng-template>

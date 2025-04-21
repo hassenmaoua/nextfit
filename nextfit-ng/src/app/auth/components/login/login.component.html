@@ -1,0 +1,84 @@
+<div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
+    <div class="flex flex-col items-center justify-center">
+        <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+            <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
+                <div class="text-center mb-8 flex flex-col items-center">
+                    <div class="w-32">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 390">
+                            <g fill="none" stroke="gray" stroke-width="2">
+                                <path
+                                    d="M245.3 178.37a.2.2 0 0 1 .37.11l.37 133.01a1.77 1.77 0 0 0 1.77 1.77l47.2-.02a2 2 0 0 0 1.99-2V94.28a1.78 1.78 0 0 0-1.78-1.78h-48.99q-.53 0-.83.44l-92.59 133.88a.31.31 0 0 1-.57-.17q.02-64.95 0-128.74c0-.95-.41-2.04-.27-3.03a2.13 2.12 3.8 0 0-2.11-2.4q-23.67 0-47.05.22-1.68.02-1.74 2.3-.21 8.15-.21 16.31-.01 99.79.21 200.28a1.67 1.66 89.8 0 0 1.66 1.66h48.22q1.25 0 1.96-1.03l92.39-133.85M428.54 94.308a1.55 1.55 0 0 0-1.548-1.553l-120.12-.21a1.55 1.55 0 0 0-1.552 1.547l-.08 45.62a1.55 1.55 0 0 0 1.548 1.553l120.12.21a1.55 1.55 0 0 0 1.552-1.547l.08-45.62M403.24 184.18a1.93 1.93 0 0 0-1.93-1.93h-94.12a1.93 1.93 0 0 0-1.93 1.93v44.88a1.93 1.93 0 0 0 1.93 1.93h94.12a1.93 1.93 0 0 0 1.93-1.93v-44.88"
+                                    vector-effect="non-scaling-stroke"
+                                />
+                            </g>
+                            <path
+                                fill="var(--primary-color)"
+                                d="M0 0h520v390H0V0Zm245.3 178.37a.2.2 0 0 1 .37.11l.37 133.01a1.77 1.77 0 0 0 1.77 1.77l47.2-.02a2 2 0 0 0 1.99-2V94.28a1.78 1.78 0 0 0-1.78-1.78h-48.99q-.53 0-.83.44l-92.59 133.88a.31.31 0 0 1-.57-.17q.02-64.95 0-128.74c0-.95-.41-2.04-.27-3.03a2.13 2.12 3.8 0 0-2.11-2.4q-23.67 0-47.05.22-1.68.02-1.74 2.3-.21 8.15-.21 16.31-.01 99.79.21 200.28a1.67 1.66 89.8 0 0 1.66 1.66h48.22q1.25 0 1.96-1.03l92.39-133.85Zm183.24-84.062a1.55 1.55 0 0 0-1.548-1.553l-120.12-.21a1.55 1.55 0 0 0-1.552 1.547l-.08 45.62a1.55 1.55 0 0 0 1.548 1.553l120.12.21a1.55 1.55 0 0 0 1.552-1.547l.08-45.62Zm-25.3 89.872a1.93 1.93 0 0 0-1.93-1.93h-94.12a1.93 1.93 0 0 0-1.93 1.93v44.88a1.93 1.93 0 0 0 1.93 1.93h94.12a1.93 1.93 0 0 0 1.93-1.93v-44.88Z"
+                            />
+                            <path
+                                fill="#fff"
+                                d="m245.3 178.37-92.39 133.85q-.71 1.03-1.96 1.03h-48.22a1.67 1.66 89.8 0 1-1.66-1.66q-.22-100.49-.21-200.28 0-8.16.21-16.31.06-2.28 1.74-2.3 23.38-.22 47.05-.22a2.13 2.12 3.8 0 1 2.11 2.4c-.14.99.27 2.08.27 3.03q.02 63.79 0 128.74a.31.31 0 0 0 .57.17L245.4 92.94q.3-.44.83-.44h48.99a1.78 1.78 0 0 1 1.78 1.78v216.96a2 2 0 0 1-1.99 2l-47.2.02a1.77 1.77 0 0 1-1.77-1.77l-.37-133.01a.2.2 0 0 0-.37-.11Z"
+                            />
+                            <rect width="123.22" height="48.72" x="-61.61" y="-24.36" fill="#fff" rx="1.55" transform="rotate(.1 -66858.33 210270.937)" />
+                            <rect width="97.98" height="48.74" x="305.26" y="182.25" fill="#fff" rx="1.93" />
+                        </svg>
+                    </div>
+                    <div class="text-surface-700 dark:text-surface-200 text-6xl font-medium mb-4"><span class="text-primary">Next</span>Fit</div>
+                    <span class="text-muted-color font-medium">Sign in to continue</span>
+                </div>
+
+                <form [formGroup]="loginForm" (ngSubmit)="submit()">
+                    <div class="flex flex-col mb-8">
+                        <label for="email" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
+                        <input pInputText id="email" type="text" placeholder="Email address" class="w-full md:w-[30rem] mb-1" formControlName="email" [ngClass]="{ 'p-invalid': f['email'].touched && f['email'].errors }" />
+                        <small *ngIf="f['email'].errors?.['required'] && f['email'].touched" class="p-error">Email is required</small>
+                    </div>
+
+                    <div class="flex flex-col mb-4">
+                        <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
+                        <p-password
+                            id="password"
+                            formControlName="password"
+                            class="mb-2"
+                            placeholder="Password"
+                            [toggleMask]="true"
+                            [fluid]="true"
+                            [feedback]="false"
+                            [ngClass]="{ 'p-invalid': f['password'].touched && f['password'].errors }"
+                        ></p-password>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-2 mb-8 gap-8">
+                        <div class="flex items-center">
+                            <p-checkbox formControlName="rememberMe" id="rememberme" binary class="mr-2"></p-checkbox>
+                            <label for="rememberme">Remember me</label>
+                        </div>
+                        <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</span>
+                    </div>
+                    <p-button label="Sign In" type="submit" styleClass="w-full mb-6"></p-button>
+
+                    <span class="font-medium text-surface-600 dark:text-surface-200">
+                        Dont have an account?
+                        <a routerLink="/auth/register" class="font-semibold cursor-pointer text-surface-900 dark:text-surface-0 hover:text-primary transition-colors duration-300">Register</a>
+                    </span>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <p-dialog [(visible)]="showErrorDialog" [modal]="true" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [style]="{ width: '30rem' }" [draggable]="false" [resizable]="false" [closeOnEscape]="true">
+        <div class="flex flex-col items-center text-center p-4">
+            <!-- Error icon with animation -->
+            <div class="w-24 h-24">
+                <p-image [src]="errorImage" alt="Error Triangle" class="w-full h-full object-contain" />
+            </div>
+
+            <!-- Error message -->
+            <h3 class="text-xl font-bold text-red-600 mb-2">Oops! Something went wrong</h3>
+            <p class="text-gray-700 mb-6">{{ errorMessage }}</p>
+
+            <!-- Action button -->
+            <button pButton type="button" label="Close" icon="pi pi-check" class="p-button-rounded p-button-danger" (click)="showErrorDialog = false"></button>
+        </div>
+    </p-dialog>
+</div>
