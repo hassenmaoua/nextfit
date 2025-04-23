@@ -1,9 +1,12 @@
 package org.nextfit.backend.service.user;
 
 
+import org.nextfit.backend.dto.requests.CompelationRequest;
 import org.nextfit.backend.entity.User;
 
 public interface IUserService {
+
+    User completeRegistration(Long userId, CompelationRequest request);
 
     User add(User user);
 

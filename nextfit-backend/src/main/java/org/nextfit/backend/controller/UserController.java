@@ -2,8 +2,12 @@ package org.nextfit.backend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.nextfit.backend.dto.UserDTO;
+import org.nextfit.backend.dto.requests.CompelationRequest;
+import org.nextfit.backend.dto.responses.UserResponseDto;
+import org.nextfit.backend.entity.User;
 import org.nextfit.backend.security.AccessService;
 import org.nextfit.backend.service.user.UserService;
 import org.nextfit.backend.utils.mapper.UserMapper;
@@ -20,7 +24,16 @@ public class UserController {
     private final UserService userService;
     private final AccessService accessService;
 
+    @PostMapping("/complete-registration")
+    public ResponseEntity<?> completeRegistration(@Valid @RequestBody CompelationRequest request) {
+        User authenticatedUser = accessService.getCurrentUser();
+        if (authenticatedUser.isRegistrationComplete()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
 
+        User user = userService.completeRegistration(authenticatedUser.getId(), request);
+        return ResponseEntity.ok(UserMapper.toUserDTO(user));
+    }
 
     @Operation(
             operationId = "load-user",

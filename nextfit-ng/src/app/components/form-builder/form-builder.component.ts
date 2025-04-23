@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { FormFieldConfig, FormSectionConfig } from '../../models/form-config.model';
@@ -8,9 +8,7 @@ import { firstValueFrom, Observable } from 'rxjs';
 import { FieldComponent } from '../../shared/components/field/field.component';
 import { PlanLevel } from '../../models/plan';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LoadingService } from '../../shared/services/loading.service';
 import { PlanService } from '../../services/plan.service';
-import { BasicPlanRequest, MealPlanRequest } from '../../models/requests';
 import { buttons } from '../../pages/home/home.component';
 import { MenuService } from '../../layout/service/menu.service';
 import { PlanDTO } from '../../models/dto';
@@ -59,7 +57,7 @@ export class FormBuilderComponent implements OnInit {
                     this.pageTitle = this.getPageTitle(planParam);
                 } else {
                     // Redirect to error page if invalid
-                    this.router.navigate(['/notfound']);
+                    this.router.navigate(['/error/notfound']);
                     return; // Stop further execution
                 }
             }

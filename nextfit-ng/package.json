@@ -25,6 +25,7 @@
         "@primeng/themes": "^19.0.5",
         "chart.js": "4.4.2",
         "google-one-tap": "^1.0.6",
+        "ngx-cookie-service": "^19.1.2",
         "primeclt": "^0.1.5",
         "primeicons": "^7.0.0",
         "primeng": "^19.0.8",

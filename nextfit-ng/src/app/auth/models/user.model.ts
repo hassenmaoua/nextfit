@@ -2,10 +2,11 @@ import { layoutConfig } from '../../layout/service/layout.service';
 
 export interface UserDTO {
     id: string;
-    firstname: string;
-    lastname: string;
+    firstName: string;
+    lastName: string;
     email: string;
     phone: string;
+    registrationComplete: boolean;
     config: layoutConfig;
 }
 

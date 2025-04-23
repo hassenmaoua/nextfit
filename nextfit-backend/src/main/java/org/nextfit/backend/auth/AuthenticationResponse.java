@@ -11,5 +11,4 @@ import org.nextfit.backend.enumeration.UserRole;
 public class AuthenticationResponse {
     private String authToken;
     private String refreshToken;
-    private UserRole role;
 }

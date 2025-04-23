@@ -1,31 +1,42 @@
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { inject, Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { AuthService } from './auth.service';
-import { firstValueFrom, skipWhile, take } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
-export class AuthGuard {
-    private isInitialCheck = true;
+@Injectable({
+    providedIn: 'root'
+})
+export class AuthGuard implements CanActivate {
+    private router = inject(Router);
 
     constructor(private authService: AuthService) {}
 
-    async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-        if (this.isInitialCheck && !this.authService.currentUser) {
-            this.isInitialCheck = false;
-            const currentUser = await this.authService.getUserByToken();
+    async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
+        // First check if we have a cached currentUser
+        if (!this.authService.currentUser) {
+            await this.authService.getUserByToken();
+        }
 
-            if (currentUser) {
-                return true;
+        // User is not authenticated at all
+        if (!this.authService.currentUser) {
+            return this.router.createUrlTree(['/auth/login'], { queryParams: { returnUrl: state.url } });
+        }
+
+        const isRegistrationCompleteRoute = state.url.includes('/auth/registration-complete');
+
+        // Case 1: User hasn't completed registration
+        if (!this.authService.currentUser.registrationComplete) {
+            if (!isRegistrationCompleteRoute) {
+                return this.router.createUrlTree(['/auth/registration-complete']);
             }
+            return true; // Allow access to registration-complete
         }
 
-        if (this.authService.currentUser) {
-            // logged in so return true
-            return true;
+        // Case 2: User has completed registration but tries to access registration-complete
+        if (isRegistrationCompleteRoute) {
+            return this.router.createUrlTree(['/']); // Redirect to home
         }
 
-        // not logged in so redirect to login page with the return url
-        this.authService.logout(state.url);
-        return false;
+        // All other cases - allow access
+        return true;
     }
 }

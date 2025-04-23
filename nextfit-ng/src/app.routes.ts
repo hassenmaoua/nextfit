@@ -1,16 +1,19 @@
 import { Routes } from '@angular/router';
 import { AppLayout } from './app/layout/components/app.layout';
 import { Landing } from './app/pages/landing/landing';
-import { Notfound } from './app/pages/notfound/notfound';
+import { Notfound } from './app/pages/errors/notfound';
 
 import { Empty } from './app/pages/empty/empty';
 import { AuthGuard } from './app/auth/services/auth.guard';
 import { HomeComponent } from './app/pages/home/home.component';
+import { Access } from './app/pages/errors/access';
+import { Error } from './app/pages/errors/error';
+import { NotAvailable } from './app/pages/errors/available';
+import authRoutes from './app/auth/auth.routes';
 
 export const appRoutes: Routes = [
+    authRoutes,
     { path: 'landing', component: Landing },
-    { path: 'auth', loadChildren: () => import('./app/auth/auth.routes') },
-    { path: 'notfound', component: Notfound },
     {
         path: '',
         component: AppLayout,
@@ -22,5 +25,14 @@ export const appRoutes: Routes = [
             { path: '', pathMatch: 'full', redirectTo: 'home' }
         ]
     },
-    { path: '**', redirectTo: '/notfound' }
+    {
+        path: 'error',
+        component: Error,
+        children: [
+            { path: '', component: NotAvailable },
+            { path: 'notfound', component: Notfound },
+            { path: 'access', component: Access }
+        ]
+    },
+    { path: '**', redirectTo: '/error/notfound' }
 ];

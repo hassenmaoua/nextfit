@@ -3,7 +3,9 @@ package org.nextfit.backend.auth;
 
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+
 import org.nextfit.backend.enumeration.TokenType;
+import org.nextfit.backend.enumeration.UserGender;
 import org.nextfit.backend.enumeration.UserRole;
 import org.nextfit.backend.entity.Token;
 import org.nextfit.backend.entity.User;
@@ -12,7 +14,11 @@ import org.nextfit.backend.exception.InvalidTokenException;
 import org.nextfit.backend.repository.TokenRepository;
 import org.nextfit.backend.repository.UserRepository;
 import org.nextfit.backend.security.JwtService;
+import org.nextfit.backend.service.email.EmailService;
+import org.nextfit.backend.service.email.EmailTemplateName;
 import org.nextfit.backend.utils.Utils;
+import org.nextfit.backend.utils.mapper.UserMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,31 +39,35 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-//    private final EmailService emailService;
+    private final EmailService emailService;
     private final TokenRepository tokenRepository;
 
-//    @Value("${application.mailing.activation-url}")
-//    private String activationUrl;
+    @Value("${application.mailing.activation-url}")
+    private String activationUrl;
 
-//    @Value("${application.default-active}")
-//    private static boolean ACTIVE;
+    @Value("${application.default-active}")
+    private static boolean ACTIVE;
 
-//    public void register(RegistrationRequest request) throws MessagingException {
+    public User register(RegistrationRequest request) throws MessagingException {
 //        var userRole = roleRepository.findByName("USER")
 //                .orElseThrow(() -> new IllegalStateException("ROLE USER was not initiated"));
-//
-//        var user = UserMapper.mapRegistrationRequestToUser(request);
-//
-//        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+
+        var user = UserMapper.mapRegistrationRequestToUser(request);
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 //        user.setRoles(Collections.singletonList(userRole));
-//        user.setBadge(UserBadge.NEW_MEMBER);
-//        user.setEnabled(ACTIVE);
-//
-//        Utils.formatUserName(user);
-//
-//        userRepository.save(user);
-//        sendValidationEmail(user);
-//    }
+        user.setFirstName("TEMP");
+        user.setFullName("TEMP");
+        user.setGender(UserGender.MALE);
+        user.setEnabled(ACTIVE);
+
+        user = userRepository.save(user);
+
+
+        sendValidationEmail(user);
+        return user;
+    }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         Authentication auth = authenticationManager.authenticate(
@@ -74,13 +84,12 @@ public class AuthenticationService {
         var authToken = jwtService.generateToken(claims, user);
         var refreshToken = jwtService.generateRefreshToken(user);
 
-        var authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-        UserRole role = authorities.contains("ADMIN") ? UserRole.ADMIN : UserRole.USER;
+//        var authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+//        UserRole role = authorities.contains("ADMIN") ? UserRole.ADMIN : UserRole.USER;
 
         return AuthenticationResponse.builder()
                 .authToken(authToken)
                 .refreshToken(refreshToken)
-                .role(role)
                 .build();
     }
 
@@ -100,7 +109,7 @@ public class AuthenticationService {
 
         if (savedToken.getValidatedAt() == null) {
             if (tokenExpiresAt.isBefore(now)) {
-//                sendValidationEmail(savedToken.getUser());
+                sendValidationEmail(savedToken.getUser());
                 throw new ExpiredTokenException("Activation token has expired. A new token has been send to the same email address");
             }
 
@@ -117,18 +126,18 @@ public class AuthenticationService {
         }
     }
 
-//    private void sendValidationEmail(User user) throws MessagingException {
-//        var newToken = generateAndSaveActivationToken(user);
-//
-//        emailService.sendEmail(
-//                user.getEmail(),
-//                user.getFullName(),
-//                EmailTemplateName.ACTIVATE_ACCOUNT,
-//                activationUrl,
-//                newToken,
-//                "Account activation"
-//        );
-//    }
+    private void sendValidationEmail(User user) throws MessagingException {
+        var newToken = generateAndSaveActivationToken(user);
+
+        emailService.sendEmail(
+                user.getEmail(),
+                user.getFullName(),
+                EmailTemplateName.ACTIVATE_ACCOUNT,
+                activationUrl,
+                newToken,
+                "Account activation"
+        );
+    }
 
     private String generateAndSaveActivationToken(org.nextfit.backend.entity.User user) {
         // Generate a token

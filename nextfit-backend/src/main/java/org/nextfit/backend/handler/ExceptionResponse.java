@@ -16,7 +16,7 @@ public class ExceptionResponse {
 
     private Integer businessErrorCode;
     private String businessErrorDescription;
-    private String error;
+    private String message;
     private Set<String> validationErrors;
     private Map<String, String> errors;
 }

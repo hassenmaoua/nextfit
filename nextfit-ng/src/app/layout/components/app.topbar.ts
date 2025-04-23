@@ -1,26 +1,23 @@
-import { Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
-import { Popover } from 'primeng/popover';
-import { Menu } from 'primeng/menu';
 import { ToastModule } from 'primeng/toast';
-import { Dialog } from 'primeng/dialog';
 import { AvatarModule } from 'primeng/avatar';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { Divider } from 'primeng/divider';
 import { AuthService } from '../../auth/services/auth.service';
+import { AppProfile } from './app.profile';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [FloatLabelModule, Divider, Dialog, Dialog, ButtonModule, PasswordModule, InputTextModule, AvatarModule, Menu, ToastModule, RouterModule, CommonModule, StyleClassModule, AppConfigurator],
+    imports: [FloatLabelModule, ButtonModule, PasswordModule, InputTextModule, AvatarModule, ToastModule, RouterModule, CommonModule, StyleClassModule, AppConfigurator, AppProfile],
     template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -93,57 +90,16 @@ import { AuthService } from '../../auth/services/auth.service';
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <!-- <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button> -->
-                    <!-- <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
-                    </button> -->
-                    <button type="button" (click)="menu.toggle($event)" class="layout-topbar-action">
-                        <i class="pi pi-user"></i>
-                        <span>Profile</span>
-                    </button>
-                    <p-menu #menu [model]="items" [popup]="true" />
+                    <app-profile></app-profile>
                 </div>
             </div>
         </div>
-
-        <p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '25rem' }">
-            <ng-template #header>
-                <div class="inline-flex items-center justify-center gap-2">
-                    <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
-                    <span class="font-bold whitespace-nowrap">Amy Elsner</span>
-                </div>
-            </ng-template>
-            <span class="text-surface-500 dark:text-surface-400 block mb-8">Update your information.</span>
-            <p-floatlabel variant="in">
-                <p-password id="currentPswd" formControlName="password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
-                <label for="currentPswd" class="font-semibold">Current password</label>
-            </p-floatlabel>
-
-            <p-divider />
-
-            <p-floatlabel variant="in">
-                <p-password id="newPswd" formControlName="password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
-                <label for="newPswd" class="font-semibold">New password</label>
-            </p-floatlabel>
-
-            <p-floatlabel variant="in">
-                <p-password id="confNewPswd" formControlName="password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
-                <label for="confNewPswd" class="font-semibold">Confirm new password</label>
-            </p-floatlabel>
-            <ng-template #footer>
-                <p-button label="Cancel" [text]="true" severity="secondary" (click)="visible = false" />
-                <p-button label="Save" [outlined]="true" severity="primary" (click)="visible = false" />
-            </ng-template>
-        </p-dialog>
     </div>`
 })
-export class AppTopbar {
+export class AppTopbar implements OnInit, AfterViewInit {
     items!: MenuItem[];
     visible: boolean = false;
+    name!: string;
 
     constructor(
         public layoutService: LayoutService,
@@ -173,6 +129,10 @@ export class AppTopbar {
                 ]
             }
         ];
+    }
+
+    ngAfterViewInit(): void {
+        this.name = this.authService.currentUser?.firstName || '';
     }
 
     toggleDarkMode() {

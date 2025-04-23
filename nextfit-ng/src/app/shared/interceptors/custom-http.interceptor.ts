@@ -1,19 +1,15 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { environment } from '../../../environment/environment';
+import { inject } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
+import { AuthService } from '../../auth/services/auth.service';
 
 export const customHttpInterceptor: HttpInterceptorFn = (req, next) => {
-    const authLocalStorageToken = `${environment.appVersion}-${environment.USERDATA_KEY}`;
+    const authService = inject(AuthService);
 
     let authToken: string | undefined;
-    try {
-        const lsValue = localStorage.getItem(authLocalStorageToken);
-        if (lsValue) {
-            const authData = JSON.parse(lsValue);
-            authToken = authData.authToken;
-        }
-    } catch (error) {
-        console.error(error);
-    }
+
+    authToken = authService.getAuthFromLocalStorage();
 
     // Check if the request URL should be excluded
     if (isExcludedUrl(req.url)) {

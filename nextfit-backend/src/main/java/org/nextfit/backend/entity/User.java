@@ -72,6 +72,9 @@ public class User implements UserDetails, Principal {
     @OneToOne(mappedBy = "user")
     LayoutConfig config;
 
+    @Column(nullable = false)
+    private boolean registrationComplete = false;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -123,7 +126,11 @@ public class User implements UserDetails, Principal {
     }
 
     public String getFullName() {
-        this.fullName = Utils.capitalizeWords(firstName) + " " + lastName.toUpperCase();
+        if (this.lastName != null) {
+            this.fullName = Utils.capitalizeWords(firstName) + " " + this.lastName.toUpperCase();
+        } else {
+            this.fullName = Utils.capitalizeWords(firstName);
+        }
         return this.fullName;
     }
 }

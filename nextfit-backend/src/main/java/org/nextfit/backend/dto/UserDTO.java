@@ -27,5 +27,6 @@ public class UserDTO {
     List<String> roles;
     boolean enabled;
     boolean accountLocked;
+    boolean registrationComplete;
     LayoutConfig config;
 }

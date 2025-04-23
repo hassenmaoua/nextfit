@@ -1,6 +1,7 @@
 package org.nextfit.backend.utils.mapper;
 
 import lombok.extern.slf4j.Slf4j;
+import org.nextfit.backend.auth.RegistrationRequest;
 import org.nextfit.backend.dto.UserDTO;
 import org.nextfit.backend.entity.User;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class UserMapper {
                 .phone(user.getPhone())
                 .enabled(user.isEnabled())
                 .accountLocked(user.isAccountLocked())
+                .registrationComplete(user.isRegistrationComplete())
                 .config(user.getConfig())
                 .build();
     }
@@ -97,30 +99,20 @@ public class UserMapper {
 //    }
 
 
-//    public static User mapRegistrationRequestToUser(RegistrationRequest request) {
-//        User user = new User();
-//        user.setUsername(request.getEmail()); // Generate username based on first name and last name
-//        user.setEmail(request.getEmail());
-//        user.setPassword(request.getPassword());
+    public static User mapRegistrationRequestToUser(RegistrationRequest request) {
+        User user = new User();
+        user.setUsername(request.getEmail()); // Generate username based on first name and last name
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
 //        user.setFirstName(request.getFirstName());
 //        user.setLastName(request.getLastName());
 //        user.setFullName(request.getFirstName() + " " + request.getLastName());
 //        user.setGender(request.getGender()); // Set default gender or update based on request
-//        user.setAddressCity(request.getAddressCity()); // Set default city or update based on request
-//        user.setAddress(""); // Set address if available in request
-//        user.setMobile(request.getMobile()); // Set mobile number if available in request
-//        user.setPhone(""); // Set phone number if available in request
-//        user.setAccountLocked(false); // By default, account is not locked
-//        user.setEnabled(false); // By default, account is disabled
-//        user.setShowEmail(false);
-//        user.setShowMobile(false);
-//        user.setShowPhone(false);
-//        user.setShowBadge(true);
-//        // Assign appropriate roles to the user
-//        // Example: Assuming 'UserRole' is an enum representing roles like ROLE_USER, ROLE_ADMIN, etc.
-//        user.setRoles(Collections.singletonList(new Role("USER"))); // Set default role or update based on your logic
-//
-//        return user;
-//    }
+        user.setPhone(""); // Set phone number if available in request
+        user.setAccountLocked(false); // By default, account is not locked
+        user.setEnabled(false);
+
+        return user;
+    }
 
 }

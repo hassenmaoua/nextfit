@@ -1,0 +1,36 @@
+<div class="max-w-4xl mx-auto px-4" *ngIf="submitted; else codeForm">
+    <div class="text-center" *ngIf="isOkay; else activationError">
+        <h1 class="text-green-500 font-bold text-2xl mb-3">Activation Successful!</h1>
+        <p-message size="large" severity="success">{{ message }}</p-message>
+        <p-button severity="primary" styleClass="mt-10" (click)="redirectToLogin()">Continue</p-button>
+    </div>
+
+    <ng-template #activationError>
+        <div class="text-center">
+            <h1 class="text-red-500 font-bold text-2xl mb-3">Activation Failed!</h1>
+            <p-message size="large" severity="error">{{ message }}</p-message>
+            <p-button severity="primary" styleClass="mt-10" (click)="clear()">Try again</p-button>
+        </div>
+    </ng-template>
+</div>
+
+<ng-template #codeForm>
+    <div class="max-w-4xl mx-auto px-4">
+        <div class="text-center mx-auto" style="width: 400px">
+            <div class="mb-10">
+                <h1 class="text-gray-900 font-bold text-2xl mb-3">Account Activation</h1>
+                <div class="text-gray-500 font-semibold text-base">Type your activation code.</div>
+            </div>
+
+            <p-inputotp [(ngModel)]="token" [length]="6" size="large" class="justify-center" />
+
+            <div class="mt-5 flex justify-center space-x-2">
+                <p-button (click)="onCodeCompleted()" severity="primary" [disabled]="isLoading$ | async">
+                    <span *ngIf="isLoading$ | async" class="animate-spin border-2 border-t-transparent border-white rounded-full w-4 h-4 mr-2"></span>
+                    {{ (isLoading$ | async) ? 'Loading...' : 'Submit' }}
+                </p-button>
+                <a pButton [outlined]="true" severity="primary" routerLink="/auth/login" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded">Cancel</a>
+            </div>
+        </div>
+    </div>
+</ng-template>

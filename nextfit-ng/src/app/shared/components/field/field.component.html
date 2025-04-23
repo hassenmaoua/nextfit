@@ -28,7 +28,7 @@
             *ngSwitchCase="'number'"
             [id]="controlName"
             [formControlName]="controlName"
-            [placeholder]="placeholder || ''"
+            [placeholder]="placeholder || '0'"
             [min]="min"
             [max]="max"
             [step]="step || '1'"
@@ -71,6 +71,8 @@
                 <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
             </ng-template>
         </p-datepicker>
+
+        <p-datepicker *ngSwitchCase="'date'" [id]="controlName" [formControlName]="controlName" [placeholder]="placeholder || 'dd/mm/yyy'" [iconDisplay]="'input'" [showIcon]="true" dateFormat="dd/mm/yy" inputId="icondisplay"> </p-datepicker>
 
         <p-inputGroup>
             <ng-container *ngFor="let add of groupAddons">

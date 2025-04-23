@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
                         ExceptionResponse.builder()
                                 .businessErrorCode(ACCOUNT_LOCKED.getCode())
                                 .businessErrorDescription(ACCOUNT_LOCKED.getDescription())
-                                .error(exp.getMessage())
+                                .message(exp.getMessage())
                                 .build()
                 );
     }
@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
                         ExceptionResponse.builder()
                                 .businessErrorCode(ACCOUNT_DISABLED.getCode())
                                 .businessErrorDescription(ACCOUNT_DISABLED.getDescription())
-                                .error(exp.getMessage())
+                                .message(exp.getMessage())
                                 .build()
                 );
     }
@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
                         ExceptionResponse.builder()
                                 .businessErrorCode(BAD_CREDENTIALS.getCode())
                                 .businessErrorDescription(BAD_CREDENTIALS.getDescription())
-                                .error("Login and / or Password is incorrect")
+                                .message("Login and / or Password is incorrect")
                                 .build()
                 );
     }
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
                 .status(INTERNAL_SERVER_ERROR)
                 .body(
                         ExceptionResponse.builder()
-                                .error(exp.getMessage())
+                                .message(exp.getMessage())
                                 .build()
                 );
     }
@@ -81,7 +81,7 @@ public class GlobalExceptionHandler {
                 .status(BAD_REQUEST)
                 .body(
                         ExceptionResponse.builder()
-                                .error(exp.getMessage())
+                                .message(exp.getMessage())
                                 .build()
                 );
     }
@@ -92,7 +92,7 @@ public class GlobalExceptionHandler {
                 .status(BAD_REQUEST)
                 .body(
                         ExceptionResponse.builder()
-                                .error(exp.getMessage())
+                                .message(exp.getMessage())
                                 .build()
                 );
     }
@@ -123,7 +123,7 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .businessErrorCode(INVALID_TOKEN.getCode())
-                                .error(INVALID_TOKEN.getDescription())
+                                .message(INVALID_TOKEN.getDescription())
                                 .businessErrorDescription(exp.getMessage())
                                 .build()
                 );
@@ -136,7 +136,7 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .businessErrorCode(EXPIRED_TOKEN.getCode())
-                                .error(EXPIRED_TOKEN.getDescription())
+                                .message(EXPIRED_TOKEN.getDescription())
                                 .businessErrorDescription(exp.getMessage())
                                 .build()
                 );
@@ -149,7 +149,7 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .businessErrorDescription("Entity not found")
-                                .error(exp.getMessage())
+                                .message(exp.getMessage())
                                 .build()
                 );
     }
@@ -161,7 +161,7 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .businessErrorDescription("Path not found")
-                                .error(exp.getMessage())
+                                .message(exp.getMessage())
                                 .build()
                 );
     }
@@ -173,7 +173,7 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .businessErrorDescription("Forbidden Exception")
-                                .error(exp.getMessage())
+                                .message(exp.getMessage())
                                 .build()
                 );
     }
@@ -186,7 +186,7 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .businessErrorDescription("Internal error, please contact the admin")
-                                .error(exp.getMessage())
+                                .message(exp.getMessage())
                                 .build()
                 );
     }

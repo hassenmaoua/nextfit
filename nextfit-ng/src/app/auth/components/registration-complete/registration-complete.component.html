@@ -1,0 +1,15 @@
+<form [formGroup]="formGoup" (ngSubmit)="submitChange()">
+    <div class="flex flex-col items-center justify-center">
+        <div class="text-surface-700 dark:text-surface-200 text-6xl font-medium mb-4"><span class="text-primary">Next</span>Fit</div>
+        <span class="text-muted-color font-medium">Please complet your registration phase</span>
+        <div class="grid md:grid-cols-2 gap-4 my-10">
+            <app-field [formGroup]="formGoup" [controlName]="'firstName'" type="text" label="First Name"></app-field>
+            <app-field [formGroup]="formGoup" [controlName]="'lastName'" type="text" label="Last Name"></app-field>
+            <app-field [formGroup]="formGoup" [controlName]="'birthDate'" type="date" label="Birth Date"></app-field>
+            <app-field [formGroup]="formGoup" [controlName]="'phone'" type="text" label="Phone number"></app-field>
+            <app-field [formGroup]="formGoup" [controlName]="'gender'" type="radio" label="Gender" [options]="genderOptions"></app-field>
+        </div>
+
+        <p-button label="Continue" type="submit" [fluid]="false"></p-button>
+    </div>
+</form>

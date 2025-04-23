@@ -4,6 +4,7 @@ package org.nextfit.backend.service.user;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.nextfit.backend.dto.requests.CompelationRequest;
 import org.nextfit.backend.entity.User;
 import org.nextfit.backend.repository.UserRepository;
 import org.nextfit.backend.utils.Utils;
@@ -17,6 +18,22 @@ import java.util.*;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+
+    @Override
+    public User completeRegistration(Long userId, CompelationRequest request) {
+        User user = get(userId);
+
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setBirthDate(request.getBirthDate());
+        user.setPhone(request.getPhone());
+        user.setRegistrationComplete(true);
+
+        Utils.formatUserName(user);
+
+        return userRepository.save(user);
+    }
 
     @Override
     public User add(User user) {

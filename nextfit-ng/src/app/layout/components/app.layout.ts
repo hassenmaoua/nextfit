@@ -14,7 +14,7 @@ import { ButtonProps } from 'primeng/button';
     standalone: true,
     imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter, ScrollTop],
     providers: [Router],
-    template: `<div class="layout-wrapper bg-gradient-to-br from-slate-100 via-white to-gray-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900" [ngClass]="containerClass">
+    template: `<div class="layout-wrapper bg-gradient-to-br from-gray-100 via-white to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900" [ngClass]="containerClass">
         <app-topbar></app-topbar>
         <app-sidebar></app-sidebar>
         <div class="layout-main-container">

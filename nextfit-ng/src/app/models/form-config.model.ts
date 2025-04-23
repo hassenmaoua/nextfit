@@ -1,4 +1,4 @@
-export type FieldType = 'text' | 'number' | 'select' | 'multiSelect' | 'selectButton' | 'checkbox' | 'radio' | 'textarea' | 'date' | 'range' | 'time';
+export type FieldType = 'text' | 'number' | 'select' | 'multiSelect' | 'selectButton' | 'checkbox' | 'radio' | 'textarea' | 'date' | 'range' | 'time' | 'date';
 
 // This would come from your backend API
 export interface FormSectionConfig {

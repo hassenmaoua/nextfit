@@ -1,45 +1,36 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
-import { first, Observable, Subscription } from 'rxjs';
+import { first, Observable, Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
-import { UserDTO } from '../../models/user.model';
 import { LoadingService } from '../../../shared/services/loading.service';
-import { Dialog } from 'primeng/dialog';
-import { Image } from 'primeng/image';
+import { InputIconModule } from 'primeng/inputicon';
+import { IconFieldModule } from 'primeng/iconfield';
 
 @Component({
     selector: 'app-login',
-    imports: [Image, Dialog, ButtonModule, CheckboxModule, InputTextModule, PasswordModule, RouterModule, RippleModule, CommonModule, FormsModule, ReactiveFormsModule],
-    providers: [Router],
+    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, RouterModule, RippleModule, CommonModule, FormsModule, ReactiveFormsModule, IconFieldModule, InputIconModule],
     templateUrl: './login.component.html',
-    styleUrl: './login.component.scss'
+    styleUrl: '../../styles.scss'
 })
 export class LoginComponent implements OnInit, OnDestroy {
-    showErrorDialog: boolean = false;
-    errorMessage = '';
-    errorImage = 'assets/images/angle-triangle.png';
-
     defaultAuth: any = {
         email: 'ADMIN',
         password: 'ADMIN'
     };
-    checked: boolean = false;
     loginForm!: FormGroup;
     returnUrl!: string;
-    isLoading$!: Observable<boolean>;
+    isLoading$: Observable<boolean>;
 
-    // private fields
-    private unsubscribe: Subscription[] = [];
+    private destroy$ = new Subject<void>();
 
     constructor(
-        private fb: FormBuilder,
         private authService: AuthService,
         private route: ActivatedRoute,
         private router: Router,
@@ -53,13 +44,16 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        console.log('LoginComponent initialized');
         this.initForm();
         // get return url from route parameters or default to '/'
         this.returnUrl = this.route.snapshot.queryParams['returnUrl'.toString()] || '/home';
     }
 
     ngOnDestroy() {
-        this.unsubscribe.forEach((sb) => sb.unsubscribe());
+        console.log('LoginComponent destroyed');
+        // this.destroy$.next();
+        // this.destroy$.complete();
     }
 
     // convenience getter for easy access to form fields
@@ -67,42 +61,44 @@ export class LoginComponent implements OnInit, OnDestroy {
         return this.loginForm.controls;
     }
 
-    initForm() {
-        // Load the last used email from local storage
-        const lastUsedEmail = localStorage.getItem('lastUsedEmail') || this.defaultAuth.email;
-
+    initForm(): void {
+        const lastEmail = localStorage.getItem('lastUsedEmail') || '';
         this.loginForm = new FormGroup({
-            email: new FormControl(lastUsedEmail, [Validators.required]),
-            password: new FormControl(this.defaultAuth.password, [Validators.required]),
-            rememberMe: new FormControl(false) // Add this control
+            email: new FormControl(this.defaultAuth.email, [Validators.required]), // Validators.email,
+            password: new FormControl(this.defaultAuth.password, [Validators.required, Validators.minLength(3)]),
+            staySignedIn: new FormControl(false)
         });
     }
 
     submit() {
         if (this.loginForm.invalid) {
-            Object.values(this.loginForm.controls).forEach((control) => {
-                control.markAsTouched();
-            });
+            this.loginForm.markAllAsTouched();
             return;
         }
-        this.loadingService.startLoading();
-        const loginSubscr = this.authService
-            .login(this.f['email'].value, this.f['password'].value)
-            .pipe(first())
-            .subscribe((user: UserDTO | undefined) => {
-                if (user) {
-                    if (user.email) localStorage.setItem('lastUsedEmail', user.email);
-                    this.router.navigate([this.returnUrl]);
-                } else {
-                    this.showError('Invalid credentials. Please try again.');
-                }
-                this.loadingService.stopLoading();
-            });
-        this.unsubscribe.push(loginSubscr);
-    }
 
-    showError(message: string) {
-        this.errorMessage = message;
-        this.showErrorDialog = true;
+        const { email, password, staySignedIn } = this.loginForm.value;
+        this.loadingService.startLoading();
+
+        this.authService
+            .login(email, password, staySignedIn)
+            .pipe(first(), takeUntil(this.destroy$))
+            .subscribe({
+                next: (user) => {
+                    if (user?.email) {
+                        if (this.loginForm.value.rememberMe) {
+                            localStorage.setItem('lastUsedEmail', user.email);
+                        }
+                        this.router.navigate([this.returnUrl]);
+                    } else {
+                        this.authService.showError('Invalid login. Please check your credentials.');
+                    }
+                },
+                error: (err) => {
+                    const message = err?.error?.message || 'Login failed. Please try again later.';
+                    console.error('Login error:', err);
+                    this.authService.showError(message);
+                },
+                complete: () => this.loadingService.stopLoading()
+            });
     }
 }

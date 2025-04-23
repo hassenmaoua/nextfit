@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Observable, BehaviorSubject, of, Subscription, lastValueFrom } from 'rxjs';
+import { Observable, BehaviorSubject, of, Subscription, lastValueFrom, throwError } from 'rxjs';
 import { map, catchError, switchMap, finalize, take } from 'rxjs/operators';
 import { environment } from '../../../environment/environment';
 import { UserDTO } from '../models/user.model';
@@ -7,6 +7,8 @@ import { Router } from '@angular/router';
 import { AuthHTTPService } from './auth-http.service';
 import { AuthModel } from '../models/auth.model';
 import { layoutConfig } from '../../layout/service/layout.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
     providedIn: 'root'
@@ -14,13 +16,19 @@ import { layoutConfig } from '../../layout/service/layout.service';
 export class AuthService implements OnDestroy {
     // private fields
     private unsubscribe: Subscription[] = [];
-    private authLocalStorageToken = `${environment.appVersion}-${environment.USERDATA_KEY}`;
+    private authStorageToken = `${environment.appVersion}-${environment.USERDATA_KEY}`;
 
     // public fields
     currentUser$: Observable<UserDTO | undefined>;
     isLoading$: Observable<boolean>;
-    currentUserSubject: BehaviorSubject<UserDTO | undefined>;
-    isLoadingSubject: BehaviorSubject<boolean>;
+
+    currentUserSubject: BehaviorSubject<UserDTO | undefined> = new BehaviorSubject<UserDTO | undefined>(undefined);
+    isLoadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
+    hasErrorSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    errorMessage: BehaviorSubject<string> = new BehaviorSubject('');
+
+    errorImage: string = 'assets/images/angle-triangle.png';
 
     get currentUser(): UserDTO | undefined {
         return this.currentUserSubject.value;
@@ -32,21 +40,27 @@ export class AuthService implements OnDestroy {
 
     constructor(
         private authHttpService: AuthHTTPService,
-        private router: Router
+        private router: Router,
+        private cookieService: CookieService
     ) {
-        this.isLoadingSubject = new BehaviorSubject<boolean>(false);
-        this.currentUserSubject = new BehaviorSubject<UserDTO | undefined>(undefined);
         this.currentUser$ = this.currentUserSubject.asObservable();
         this.isLoading$ = this.isLoadingSubject.asObservable();
     }
 
     // public methods
-    login(email: string, password: string): Observable<UserDTO | undefined> {
+    login(email: string, password: string, staySignedIn: boolean): Observable<UserDTO | undefined> {
         this.isLoadingSubject.next(true);
         return this.authHttpService.login(email, password).pipe(
             map((auth: AuthModel) => {
-                const result = this.setAuthFromLocalStorage(auth);
-                return result;
+                if (auth?.authToken) {
+                    if (staySignedIn) {
+                        const expiryDate = new Date();
+                        expiryDate.setDate(expiryDate.getDate() + 7);
+                        this.cookieService.set(this.authStorageToken, auth?.authToken, { expires: expiryDate, path: '/', secure: true, sameSite: 'Lax' });
+                    } else {
+                        this.cookieService.set(this.authStorageToken, auth?.authToken, { path: '/', secure: true, sameSite: 'Lax' });
+                    }
+                }
             }),
             switchMap(() => this.getUserByToken()),
             catchError((err) => {
@@ -58,11 +72,12 @@ export class AuthService implements OnDestroy {
     }
 
     async logout(returnUrl?: string): Promise<void> {
-        // Clear local storage
-        localStorage.removeItem(this.authLocalStorageToken);
+        // Clear cookie storage
+        this.cookieService.delete(this.authStorageToken, '/');
 
         // Reset current user
         this.currentUserSubject.next(undefined);
+        location.reload();
 
         this.router.navigate(['/auth/login'], {
             queryParams: { returnUrl: returnUrl }
@@ -70,8 +85,8 @@ export class AuthService implements OnDestroy {
     }
 
     async getUserByToken(): Promise<UserDTO | undefined> {
-        const auth = this.getAuthFromLocalStorage();
-        if (!auth || !auth.refreshToken) {
+        const token = this.getAuthFromLocalStorage();
+        if (!token) {
             return undefined;
         }
 
@@ -79,7 +94,7 @@ export class AuthService implements OnDestroy {
 
         try {
             const user = await lastValueFrom(
-                this.authHttpService.getUserByToken(auth.refreshToken).pipe(
+                this.authHttpService.getUserByToken(token).pipe(
                     take(1) // Ensure the observable completes
                 )
             );
@@ -124,43 +139,56 @@ export class AuthService implements OnDestroy {
     }
 
     // need create new user then login
-    // registration(user: RegistrationRequest): Observable<boolean> {
-    //     this.isLoadingSubject.next(true);
+    registration(email: string, password: string): Observable<any> {
+        this.isLoadingSubject.next(true);
 
-    //     return this.authHttpService.createUser(user).pipe(
-    //         map(() => true), // Mapping createUser success to true
-    //         catchError((err) => {
-    //             console.error('Error during user registration:', err);
-    //             return of(false); // Returning false in case of an error
-    //         }),
-    //         finalize(() => this.isLoadingSubject.next(false))
-    //     );
-    // }
+        return this.authHttpService.createUser({ email, password }).pipe(
+            map((response) => response),
+            catchError((err: HttpErrorResponse) => {
+                const message = err?.error?.message || 'Unknown error during registration';
+                return throwError(() => new Error(message)); // propagate error as Error
+            }),
+            finalize(() => this.isLoadingSubject.next(false))
+        );
+    }
+
+    confirm(token: string): Observable<any> {
+        this.isLoadingSubject.next(true);
+        return this.authHttpService.confirm(token).pipe(finalize(() => this.isLoadingSubject.next(false)));
+    }
 
     forgotPassword(email: string): Observable<boolean> {
         this.isLoadingSubject.next(true);
         return this.authHttpService.forgotPassword(email).pipe(finalize(() => this.isLoadingSubject.next(false)));
     }
 
-    // private methods
-    private setAuthFromLocalStorage(auth: AuthModel): boolean {
-        // store auth authToken/refreshToken/epiresIn in local storage to keep user logged in between page refreshes
-        if (auth && auth.authToken) {
-            localStorage.setItem(this.authLocalStorageToken, JSON.stringify(auth));
-            return true;
-        }
-        return false;
+    changePassword(token: string, password: any) {
+        this.isLoadingSubject.next(true);
+        return this.authHttpService.changePassword({ token, password }).pipe(finalize(() => this.isLoadingSubject.next(false)));
     }
 
-    private getAuthFromLocalStorage(): AuthModel | undefined {
+    complet(firstName: any, lastName: any, birthDate: any, phone: any, gender: any) {
+        this.isLoadingSubject.next(true);
+        return this.authHttpService.complet({ firstName, lastName, birthDate, phone, gender }).pipe(finalize(() => this.isLoadingSubject.next(false)));
+    }
+
+    showError(message: string) {
+        this.errorMessage.next(message);
+        this.hasErrorSubject.next(true);
+    }
+
+    closeError() {
+        this.hasErrorSubject.next(false);
+        this.errorMessage.next('');
+    }
+
+    getAuthFromLocalStorage(): string | undefined {
         try {
-            const lsValue = localStorage.getItem(this.authLocalStorageToken);
+            const lsValue = this.cookieService.get(this.authStorageToken);
             if (!lsValue) {
                 return undefined;
             }
-
-            const authData = JSON.parse(lsValue);
-            return authData;
+            return lsValue;
         } catch (error) {
             console.error(error);
             return undefined;
