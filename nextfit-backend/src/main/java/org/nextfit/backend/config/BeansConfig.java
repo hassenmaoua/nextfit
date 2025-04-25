@@ -1,6 +1,7 @@
 package org.nextfit.backend.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +24,10 @@ import java.util.List;
 public class BeansConfig {
 
     private final UserDetailsService userDetailsService;
+
+    @Value("${cors.allowed-origins}")
+    private String[] allowedOrigins;
+
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -47,7 +52,7 @@ public class BeansConfig {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         final CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:4200", "http://192.168.1.8:4200"));
+        config.setAllowedOrigins(Arrays.asList(allowedOrigins));
         config.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.ORIGIN,
                 HttpHeaders.CONTENT_TYPE,
