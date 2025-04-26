@@ -3,21 +3,28 @@ import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DatePickerModule } from 'primeng/datepicker';
 import { FieldComponent } from '../../../shared/components/field/field.component';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { FieldConfig } from '../../../models/form-builder/form-config.model';
+import { profileConfig } from '../../../core/profile-form.config';
+import { CommonModule } from '@angular/common';
+import { FieldService } from '../../../services/field.service';
+import { UserDTO } from '../../models/user.model';
 
 @Component({
     selector: 'app-complete',
-    imports: [ReactiveFormsModule, RouterModule, ButtonModule, InputTextModule, FieldComponent, DatePickerModule],
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, ButtonModule, InputTextModule, FieldComponent, DatePickerModule],
     templateUrl: 'registration-complete.component.html'
 })
 export class RegistrationCompleteComponent implements OnInit, OnDestroy {
+    private unsubscribe: Subscription[] = [];
+
+    fields: FieldConfig[] = profileConfig;
     formGoup!: FormGroup;
     isLoading$: Observable<boolean>;
-    isLoadingSubject: BehaviorSubject<boolean>;
 
     genderOptions = [
         { label: 'Male', value: 'MALE' },
@@ -26,41 +33,47 @@ export class RegistrationCompleteComponent implements OnInit, OnDestroy {
 
     constructor(
         private router: Router,
-        private authService: AuthService
+        private authService: AuthService,
+        private fb: FormBuilder,
+        private fieldService: FieldService
     ) {
-        this.isLoadingSubject = new BehaviorSubject<boolean>(false);
-        this.isLoading$ = this.isLoadingSubject.asObservable();
+        this.isLoading$ = authService.isLoading$;
     }
+
     ngOnInit(): void {
         this.initForm();
     }
 
-    ngOnDestroy(): void {}
-
-    initForm() {
-        this.formGoup = new FormGroup({
-            firstName: new FormControl('', [Validators.required]),
-            lastName: new FormControl('', [Validators.required]),
-            birthDate: new FormControl(null, [Validators.required]),
-            phone: new FormControl(null, [Validators.required]),
-            gender: new FormControl('', [Validators.required])
-        });
+    ngOnDestroy(): void {
+        this.unsubscribe.forEach((sub) => sub.unsubscribe());
     }
 
+    initForm() {
+        this.formGoup = this.fieldService.createFormGroup(this.fields);
+    }
     submitChange() {
-        this.isLoadingSubject.next(true);
-        const { firstName, lastName, birthDate, phone, gender } = this.formGoup.value;
+        const { firstName, lastName, birthDate, phone, currentActivity, height, weight, gender } = this.formGoup.value;
 
-        const changePasswordSubscr = this.authService.complet(firstName, lastName, birthDate, phone, gender).subscribe(
-            (response: any) => {
-                this.isLoadingSubject.next(false);
-                this.router.navigate(['/home']);
-            },
-            (error: any) => {
-                console.error('failed:', error);
-                this.isLoadingSubject.next(false);
-            }
-        );
-        // this.unsubscribe.push(changePasswordSubscr);
+        const subsc = this.authService
+            .complet({
+                firstName,
+                lastName,
+                birthDate,
+                phone,
+                currentActivity,
+                height,
+                weight,
+                gender
+            })
+            .subscribe({
+                next: (res: UserDTO) => {
+                    this.authService.currentUserSubject.next(res);
+                    this.router.navigate(['/home']);
+                },
+                error: (error: any) => {
+                    console.error('failed:', error);
+                }
+            });
+        this.unsubscribe.push(subsc);
     }
 }

@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { FormFieldConfig, FormSectionConfig } from '../models/form-config.model';
+import { FormSectionConfig } from '../models/form-builder/form-config.model';
 import { PlanLevel } from '../models/plan';
 import { personalSectionConfig } from './data';
 import { basicConfig } from '../core/basic-form.config';
 import { mealConfig } from '../core/meal-form.config';
 import { basicPreferencesConfig } from '../core/basic-preferences.config';
 import { mealPreferencesConfig } from '../core/meal-preferences.config';
+import { FieldService } from './field.service';
 
 @Injectable({
     providedIn: 'root'
@@ -33,7 +34,10 @@ export class FormService {
     private intervalId: any;
     private index = 0;
 
-    constructor(private fb: FormBuilder) {}
+    constructor(
+        private fb: FormBuilder,
+        private fieldService: FieldService
+    ) {}
 
     // Simulate API call to get form configuration
     getFormConfig(level: string): Observable<FormSectionConfig[]> {
@@ -68,37 +72,12 @@ export class FormService {
 
         steps.forEach((step) => {
             step.fields.forEach((field) => {
-                const validators = this.getValidators(field);
+                const validators = this.fieldService.getValidators(field);
                 group[field.fieldName] = [field.defaultValue || null, validators];
             });
         });
 
         return this.fb.group(group);
-    }
-
-    private getValidators(field: FormFieldConfig): any[] {
-        if (!field.validators) return [];
-
-        return field.validators.map((validator) => {
-            switch (validator.type) {
-                case 'required':
-                    return Validators.required;
-                case 'min':
-                    return Validators.min(validator.value!);
-                case 'max':
-                    return Validators.max(validator.value!);
-                case 'minLength':
-                    return Validators.minLength(validator.value!);
-                case 'maxLength':
-                    return Validators.maxLength(validator.value!);
-                case 'pattern':
-                    return Validators.pattern(validator.value!);
-                case 'email':
-                    return Validators.email;
-                default:
-                    return Validators.nullValidator;
-            }
-        });
     }
 
     getLoadingStatus(): Observable<boolean> {

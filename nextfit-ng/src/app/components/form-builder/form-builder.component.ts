@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { FormFieldConfig, FormSectionConfig } from '../../models/form-config.model';
+import { FieldConfig, FormSectionConfig } from '../../models/form-builder/form-config.model';
 import { FormService } from '../../services/form.service';
 import imports from './imports';
 import { firstValueFrom, Observable } from 'rxjs';
@@ -98,8 +98,9 @@ export class FormBuilderComponent implements OnInit {
             header: 'Are you sure?',
             message: 'Please confirm to proceed.',
             accept: () => {
-                this.formService.startLoading();
-                this.generatePlan(this.planLevel, this.form.value);
+                // this.formService.startLoading();
+                // this.generatePlan(this.planLevel, this.form.value);
+                console.log(this.form.value);
             }
         });
     }
@@ -180,7 +181,7 @@ export class FormBuilderComponent implements OnInit {
         return this.form?.get(stepId) as FormGroup;
     }
 
-    isFieldVisible(field: FormFieldConfig): boolean {
+    isFieldVisible(field: FieldConfig): boolean {
         if (!this.form || !this.form.controls[field.fieldName]) {
             return false;
         }

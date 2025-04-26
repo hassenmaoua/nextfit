@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
 import { SliderModule } from 'primeng/slider';
-import { FieldType, FieldValidator, SelectOption } from '../../../models/form-config.model';
+import { FieldType, FieldValidator, FieldConfig, SelectOption } from '../../../models/form-builder/form-config.model';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -37,12 +37,14 @@ import { DatePickerModule } from 'primeng/datepicker';
     templateUrl: './field.component.html',
     styleUrl: './field.component.scss'
 })
-export class FieldComponent {
-    @Input() id?: string;
+export class FieldComponent implements OnInit {
     @Input() formGroup!: FormGroup;
     @Input() controlName!: string;
-    @Input() type!: FieldType;
 
+    @Input() config?: FieldConfig;
+
+    @Input() id?: string;
+    @Input() type!: FieldType;
     @Input() disabled: boolean = false;
     @Input() validators?: FieldValidator[];
     @Input() label?: string;
@@ -56,6 +58,23 @@ export class FieldComponent {
     @Input() groupAddons?: { value: string; position: 'start' | 'end' }[];
 
     suggestions: string[] = [];
+
+    ngOnInit(): void {
+        if (this.config) {
+            this.id = this.id ?? this.config.fieldName;
+            this.type = this.type ?? this.config.fieldType;
+            this.label = this.label ?? this.config.fieldLabel;
+            this.placeholder = this.placeholder ?? this.config.placeholder ?? '';
+            this.required = this.required ?? this.config.required ?? false;
+            this.validators = this.validators ?? this.config.validators ?? [];
+            this.options = this.options.length > 0 ? this.options : (this.config.options ?? []);
+            this.min = this.min ?? this.config.min;
+            this.max = this.max ?? this.config.max;
+            this.step = this.step ?? this.config.step;
+            this.suffix = this.suffix ?? this.config.suffix;
+            this.groupAddons = this.groupAddons && this.groupAddons.length > 0 ? this.groupAddons : (this.config.groupAddons ?? []);
+        }
+    }
 
     get control() {
         return this.formGroup.controls[this.controlName];

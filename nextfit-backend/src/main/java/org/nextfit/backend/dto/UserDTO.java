@@ -23,7 +23,11 @@ public class UserDTO {
     String fullName;
     UserGender gender;
     LocalDate birthDate;
+    int age;
     String phone;
+    String currentActivity;
+    int weight;
+    int height;
     List<String> roles;
     boolean enabled;
     boolean accountLocked;

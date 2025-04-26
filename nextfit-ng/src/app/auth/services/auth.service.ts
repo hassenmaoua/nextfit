@@ -9,6 +9,8 @@ import { AuthModel } from '../models/auth.model';
 import { layoutConfig } from '../../layout/service/layout.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
+import { UserService } from '../../services/user.service';
+import { UpdateProfileRequest } from '../../models/requests/update-profile-request.model';
 
 @Injectable({
     providedIn: 'root'
@@ -40,6 +42,7 @@ export class AuthService implements OnDestroy {
 
     constructor(
         private authHttpService: AuthHTTPService,
+        private userService: UserService,
         private router: Router,
         private cookieService: CookieService
     ) {
@@ -167,9 +170,9 @@ export class AuthService implements OnDestroy {
         return this.authHttpService.changePassword({ token, password }).pipe(finalize(() => this.isLoadingSubject.next(false)));
     }
 
-    complet(firstName: any, lastName: any, birthDate: any, phone: any, gender: any) {
+    complet(formValue: UpdateProfileRequest) {
         this.isLoadingSubject.next(true);
-        return this.authHttpService.complet({ firstName, lastName, birthDate, phone, gender }).pipe(finalize(() => this.isLoadingSubject.next(false)));
+        return this.userService.updateProfile(formValue).pipe(finalize(() => this.isLoadingSubject.next(false)));
     }
 
     showError(message: string) {

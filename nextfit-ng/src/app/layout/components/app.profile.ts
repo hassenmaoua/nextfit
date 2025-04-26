@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { MenuModule } from 'primeng/menu';
 import { BadgeModule } from 'primeng/badge';
 import { RippleModule } from 'primeng/ripple';
 import { AvatarModule } from 'primeng/avatar';
 import { AuthService } from '../../auth/services/auth.service';
-import { Router } from '@angular/router';
 import { UserDTO } from '../../auth/models/user.model';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
@@ -14,8 +13,12 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { ButtonModule } from 'primeng/button';
 import { FieldComponent } from '../../shared/components/field/field.component';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { FormFieldConfig } from '../../models/form-config.model';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { FieldConfig } from '../../models/form-builder/form-config.model';
+import { profileConfig } from '../../core/profile-form.config';
+import { UserService } from '../../services/user.service';
+import { FieldService } from '../../services/field.service';
+import { ConfirmPasswordValidator } from '../../auth/initializer/confirm-password.validator';
 
 @Component({
     selector: 'app-profile',
@@ -26,7 +29,8 @@ import { FormFieldConfig } from '../../models/form-config.model';
             <i class="pi pi-user"></i>
             <span>Profile</span>
         </button>
-        <p-menu #menu [model]="items" [popup]="true" class="flex justify-center" styleClass="w-full md:w-60">
+
+        <p-menu #menu [model]="items" [popup]="true" styleClass="w-full md:w-60" [style]="{ top: '0 !important' }">
             <ng-template #start>
                 <div pRipple class="flex flex-column items-center justify-start p-2 pt-4">
                     <p-avatar [label]="(user?.firstName?.slice(0, 1) || 'A').toUpperCase()" styleClass="mr-2" shape="circle" />
@@ -51,49 +55,36 @@ import { FormFieldConfig } from '../../models/form-config.model';
                 </a>
             </ng-template>
         </p-menu>
+
         <p-dialog header="Change your password" [(visible)]="passwordVisible" [modal]="true" [style]="{ width: '25rem' }">
-            <p-floatlabel variant="in">
-                <p-password id="currentPswd" formControlName="password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
-                <label for="currentPswd" class="font-semibold">Current password</label>
-            </p-floatlabel>
+            <form [formGroup]="passwordForm" (ngSubmit)="submitPasswordChange()">
+                <p-floatlabel variant="in">
+                    <p-password id="oldPassword" formControlName="oldPassword" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
+                    <label for="oldPassword" class="font-semibold">Current password</label>
+                </p-floatlabel>
 
-            <p-floatlabel variant="in">
-                <p-password id="newPswd" formControlName="password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
-                <label for="newPswd" class="font-semibold">New password</label>
-            </p-floatlabel>
+                <p-floatlabel variant="in">
+                    <p-password id="newPassword" formControlName="newPassword" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
+                    <label for="newPassword" class="font-semibold">New password</label>
+                </p-floatlabel>
 
-            <p-floatlabel variant="in">
-                <p-password id="confNewPswd" formControlName="password" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
-                <label for="confNewPswd" class="font-semibold">Confirm new password</label>
-            </p-floatlabel>
-
+                <p-floatlabel variant="in">
+                    <p-password id="cPassword" formControlName="cPassword" [toggleMask]="true" styleClass="mb-4" [fluid]="true" [feedback]="false"></p-password>
+                    <label for="cPassword" class="font-semibold">Confirm new password</label>
+                </p-floatlabel>
+            </form>
             <ng-template #footer>
-                <p-button label="Cancel" severity="primary" [outlined]="true" [text]="true" (click)="passwordVisible = false" />
-                <p-button label="Save" severity="primary" (click)="passwordVisible = false" />
+                <p-button label="Cancel" severity="primary" [outlined]="true" [text]="true" [disabled]="isLoading$ | async" (click)="passwordVisible = false" />
+                <p-button severity="primary" (click)="submitPasswordChange()" [loading]="isLoading$ | async" [label]="(isLoading$ | async) ? 'Please wait...' : 'Save'" />
             </ng-template>
         </p-dialog>
 
         <p-dialog header="Update profile" [(visible)]="settingsVisible" [modal]="true" [style]="{ width: 'auto', height: 'auto' }">
-            <form [formGroup]="form" (ngSubmit)="submitChange()">
+            <form [formGroup]="profileForm" (ngSubmit)="submitProfileUpdate()">
                 <div class="grid md:grid-cols-2 gap-4">
                     <ng-container *ngFor="let field of fields">
                         <div [class]="field.width ? 'md:col-span-' + field.width : ''">
-                            <app-field
-                                [id]="field.fieldName"
-                                [formGroup]="form"
-                                [controlName]="field.fieldName"
-                                [label]="field.fieldLabel"
-                                [type]="field.fieldType"
-                                [validators]="field.validators"
-                                [placeholder]="field.placeholder"
-                                [required]="field.required"
-                                [options]="field.options || []"
-                                [min]="field.min"
-                                [max]="field.max"
-                                [step]="field.step"
-                                [suffix]="field.suffix"
-                                [groupAddons]="field.groupAddons"
-                            ></app-field>
+                            <app-field [formGroup]="profileForm" [controlName]="field.fieldName" [config]="field"></app-field>
                         </div>
                     </ng-container>
                 </div>
@@ -106,8 +97,14 @@ import { FormFieldConfig } from '../../models/form-config.model';
         </p-dialog>
     `
 })
-export class AppProfile implements OnInit {
-    form!: FormGroup;
+export class AppProfile implements OnInit, OnDestroy {
+    private unsubscribe: Subscription[] = [];
+
+    fields: FieldConfig[] = profileConfig;
+
+    profileForm!: FormGroup;
+    passwordForm!: FormGroup;
+
     isLoading$: Observable<boolean>;
     isLoadingSubject: BehaviorSubject<boolean>;
 
@@ -125,7 +122,8 @@ export class AppProfile implements OnInit {
     constructor(
         private fb: FormBuilder,
         private authService: AuthService,
-        private router: Router
+        private fieldService: FieldService,
+        private userService: UserService
     ) {
         this.isLoadingSubject = new BehaviorSubject<boolean>(false);
         this.isLoading$ = this.isLoadingSubject.asObservable();
@@ -170,60 +168,87 @@ export class AppProfile implements OnInit {
         ];
     }
 
+    ngOnDestroy(): void {
+        this.unsubscribe.forEach((sub) => sub.unsubscribe());
+    }
+
     ngAfterViewInit(): void {
         this.user = this.authService.currentUser;
-    }
 
-    initForm() {
-        const group: { [key: string]: any } = {};
-        this.fields.forEach((field) => {
-            const validators = this.getValidators(field);
-            group[field.fieldName] = [field.defaultValue || null, validators];
-        });
-
-        this.form = this.fb.group(group);
-    }
-
-    private getValidators(field: FormFieldConfig): any[] {
-        if (!field.validators) return [];
-
-        return field.validators.map((validator) => {
-            switch (validator.type) {
-                case 'required':
-                    return Validators.required;
-                case 'min':
-                    return Validators.min(validator.value!);
-                case 'max':
-                    return Validators.max(validator.value!);
-                case 'minLength':
-                    return Validators.minLength(validator.value!);
-                case 'maxLength':
-                    return Validators.maxLength(validator.value!);
-                case 'pattern':
-                    return Validators.pattern(validator.value!);
-                case 'email':
-                    return Validators.email;
-                default:
-                    return Validators.nullValidator;
+        // Loop through each form control and set its value if the user has a matching property
+        Object.keys(this.profileForm.controls).forEach((key) => {
+            if (this.user && this.isUserKey(key)) {
+                this.profileForm.controls[key].setValue(this.user[key]);
             }
         });
     }
 
-    submitChange() {
-        this.isLoadingSubject.next(true);
-        const { firstName, lastName, birthDate, phone, gender } = this.form.value;
+    isUserKey(key: string): key is keyof UserDTO {
+        return key in (this.user || {});
+    }
 
-        // const changePasswordSubscr = this.authService.complet(firstName, lastName, birthDate, phone, gender).subscribe(
-        //     (response: any) => {
-        //         this.isLoadingSubject.next(false);
-        //         this.settingsVisible = false;
-        //     },
-        //     (error: any) => {
-        //         console.error('failed:', error);
-        //         this.isLoadingSubject.next(false);
-        //     }
-        // );
-        // this.unsubscribe.push(changePasswordSubscr);
+    initForm() {
+        this.profileForm = this.fieldService.createFormGroup(this.fields);
+        this.passwordForm = new FormGroup(
+            {
+                oldPassword: new FormControl('', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])),
+                newPassword: new FormControl('', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])),
+                cPassword: new FormControl('', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)]))
+            },
+            {
+                validators: ConfirmPasswordValidator.MatchNewPassword
+            }
+        );
+    }
+
+    submitProfileUpdate() {
+        this.isLoadingSubject.next(true);
+        const { firstName, lastName, birthDate, phone, currentActivity, height, weight, gender } = this.profileForm.value;
+
+        const subsc = this.userService
+            .updateProfile({
+                firstName,
+                lastName,
+                birthDate,
+                phone,
+                currentActivity,
+                height,
+                weight,
+                gender
+            })
+            .subscribe({
+                next: (res: UserDTO) => {
+                    this.authService.currentUserSubject.next(res);
+                    this.isLoadingSubject.next(false);
+                    this.settingsVisible = false;
+                },
+                error: (error: any) => {
+                    console.error('failed:', error);
+                    this.isLoadingSubject.next(false);
+                }
+            });
+        this.unsubscribe.push(subsc);
+    }
+
+    submitPasswordChange() {
+        if (!this.user || this.passwordForm.invalid) {
+            return;
+        }
+        this.isLoadingSubject.next(true);
+        const { oldPassword, newPassword } = this.passwordForm.value;
+
+        const subsc = this.userService.changePassword(this.user.id, oldPassword, newPassword).subscribe({
+            next: (res: UserDTO) => {
+                this.isLoadingSubject.next(false);
+                this.passwordVisible = false;
+                this.authService.logout();
+            },
+            error: (error: any) => {
+                console.error('failed:', error);
+                this.isLoadingSubject.next(false);
+            }
+        });
+        this.unsubscribe.push(subsc);
     }
 
     showPasswordDialog() {
@@ -233,112 +258,4 @@ export class AppProfile implements OnInit {
     showSettingsDialog() {
         this.settingsVisible = true;
     }
-
-    fields: FormFieldConfig[] = [
-        {
-            width: 1,
-            defaultValue: '',
-            fieldName: 'firstName',
-            fieldLabel: 'First Name',
-            fieldType: 'text',
-            required: true,
-
-            validators: [{ type: 'required', message: 'First Name is required' }]
-        },
-
-        {
-            width: 1,
-            defaultValue: '',
-            fieldName: 'lastName',
-            fieldLabel: 'Last Name',
-            fieldType: 'text',
-            required: true,
-
-            validators: [{ type: 'required', message: 'Last Name is required' }]
-        },
-
-        {
-            width: 1,
-            defaultValue: '',
-            fieldName: 'birthDate',
-            fieldLabel: 'Date of birth',
-            fieldType: 'date',
-            required: true,
-
-            validators: [{ type: 'required', message: 'BirthDate is required' }]
-        },
-
-        {
-            width: 1,
-            defaultValue: '',
-            fieldName: 'phone',
-            fieldLabel: 'Phone Number',
-            fieldType: 'text',
-            required: true,
-
-            validators: [{ type: 'required', message: 'Phone is required' }]
-        },
-
-        {
-            width: 2,
-            defaultValue: '1-2x/week',
-            fieldName: 'currentActivity',
-            fieldLabel: 'Current Physical Activity',
-            fieldType: 'selectButton',
-            required: true,
-            options: [
-                { label: 'Never', value: 'never' },
-                { label: '1-2x/week', value: '1-2x/week' },
-                { label: '3-4x/week', value: '3-4x/week' },
-                { label: '5+ times/week', value: '5+ times/week' }
-            ],
-            validators: [{ type: 'required', message: 'Current activity level is required' }]
-        },
-
-        {
-            width: 1,
-            fieldName: 'weight',
-            fieldLabel: 'Weight',
-            fieldType: 'number',
-            defaultValue: 70,
-            required: true,
-            min: 20,
-            max: 150,
-            suffix: ' KG',
-            validators: [
-                { type: 'required', message: 'Weight is required' },
-                { type: 'min', value: 20, message: 'Minimum weight is 20kg' },
-                { type: 'max', value: 150, message: 'Maximum weight is 150kg' }
-            ]
-        },
-        {
-            width: 1,
-            fieldName: 'height',
-            fieldLabel: 'Height',
-            fieldType: 'number',
-            defaultValue: 172,
-            required: true,
-            min: 50,
-            max: 200,
-            suffix: ' CM',
-            validators: [
-                { type: 'required', message: 'Height is required' },
-                { type: 'min', value: 50, message: 'Minimum height is 50cm' },
-                { type: 'max', value: 200, message: 'Maximum height is 200cm' }
-            ]
-        },
-        {
-            width: 1,
-            fieldName: 'gender',
-            fieldLabel: 'Gender',
-            fieldType: 'radio',
-            defaultValue: 'MALE',
-            required: true,
-            options: [
-                { label: 'Male', value: 'MALE' },
-                { label: 'Female', value: 'FEMALE' }
-            ],
-            validators: [{ type: 'required', message: 'Gender is required' }]
-        }
-    ];
 }
