@@ -6,10 +6,10 @@ export interface FormSectionConfig {
     label: string;
     description?: string;
     size?: 1 | 2 | 3 | 4 | 5 | 6;
-    fields: FormFieldConfig[];
+    fields: FieldConfig[];
 }
 
-export interface FormFieldConfig {
+export interface FieldConfig {
     width: 1 | 2 | 3 | 4 | 5 | 6;
     fieldName: string;
     fieldLabel: string;

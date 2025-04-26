@@ -65,6 +65,7 @@
             [showIcon]="true"
             [timeOnly]="true"
             inputId="templatedisplay"
+            dataType="string"
             [showOnFocus]="false"
         >
             <ng-template #inputicon let-clickCallBack="clickCallBack">
@@ -72,7 +73,7 @@
             </ng-template>
         </p-datepicker>
 
-        <p-datepicker *ngSwitchCase="'date'" [id]="controlName" [formControlName]="controlName" [placeholder]="placeholder || 'dd/mm/yyy'" [iconDisplay]="'input'" [showIcon]="true" dateFormat="dd/mm/yy" inputId="icondisplay"> </p-datepicker>
+        <p-datepicker *ngSwitchCase="'date'" [id]="controlName" [formControlName]="controlName" [placeholder]="placeholder || 'yyyy-mm-dd'" [iconDisplay]="'input'" [showIcon]="true" dateFormat="yy-mm-dd" inputId="icondisplay"> </p-datepicker>
 
         <p-inputGroup>
             <ng-container *ngFor="let add of groupAddons">

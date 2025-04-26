@@ -84,15 +84,15 @@ import { AppProfile } from './app.profile';
                 </div>
             </div>
 
-            <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout" [hideOnOutsideClick]="true">
+            <!-- <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout" [hideOnOutsideClick]="true">
                 <i class="pi pi-ellipsis-v"></i>
-            </button>
+            </button> -->
 
-            <div class="layout-topbar-menu hidden lg:block">
-                <div class="layout-topbar-menu-content">
-                    <app-profile></app-profile>
-                </div>
+            <!-- <div class="layout-topbar-menu hidden lg:block"> -->
+            <div class="layout-topbar-menu-content">
+                <app-profile></app-profile>
             </div>
+            <!-- </div> -->
         </div>
     </div>`
 })

@@ -1,4 +1,4 @@
-import { FormSectionConfig } from '../models/form-config.model';
+import { FormSectionConfig } from '../models/form-builder/form-config.model';
 
 export const mealConfig: FormSectionConfig[] = [
     {

@@ -5,8 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.nextfit.backend.dto.UserDTO;
-import org.nextfit.backend.dto.requests.CompelationRequest;
-import org.nextfit.backend.dto.responses.UserResponseDto;
+import org.nextfit.backend.dto.requests.UpdateUserRequest;
 import org.nextfit.backend.entity.User;
 import org.nextfit.backend.security.AccessService;
 import org.nextfit.backend.service.user.UserService;
@@ -24,14 +23,11 @@ public class UserController {
     private final UserService userService;
     private final AccessService accessService;
 
-    @PostMapping("/complete-registration")
-    public ResponseEntity<?> completeRegistration(@Valid @RequestBody CompelationRequest request) {
+    @PostMapping("/update-profile")
+    public ResponseEntity<?> updateProfile(@Valid @RequestBody UpdateUserRequest request) {
         User authenticatedUser = accessService.getCurrentUser();
-        if (authenticatedUser.isRegistrationComplete()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
 
-        User user = userService.completeRegistration(authenticatedUser.getId(), request);
+        User user = userService.updateUserProfile(authenticatedUser.getId(), request);
         return ResponseEntity.ok(UserMapper.toUserDTO(user));
     }
 

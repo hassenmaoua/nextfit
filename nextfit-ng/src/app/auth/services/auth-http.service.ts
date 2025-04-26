@@ -43,10 +43,6 @@ export class AuthHTTPService {
         return this.http.post<boolean>(`${API_PASSWORD_URL}/change`, body);
     }
 
-    complet(body: any) {
-        return this.http.post<boolean>(`${environment.apiUrl}/user/complete-registration`, body);
-    }
-
     getUserByToken(token: string): Observable<UserDTO> {
         const httpHeaders = new HttpHeaders({
             Authorization: `Bearer ${token}`

@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Collection;
 import java.util.List;
 
@@ -62,6 +63,15 @@ public class User implements UserDetails, Principal {
 
     @Column(name = "phone")
     String phone;
+
+    @Column(name = "acitivty")
+    String currentActivity;
+
+    @Column(name = "weight", nullable = false)
+    private int weight = 0;
+
+    @Column(name = "height", nullable = false)
+    private int height = 0;
 
     @Column(name = "locked")
     boolean accountLocked;
@@ -132,5 +142,12 @@ public class User implements UserDetails, Principal {
             this.fullName = Utils.capitalizeWords(firstName);
         }
         return this.fullName;
+    }
+
+    public int getAge() {
+        if (birthDate == null) {
+            return 0;
+        }
+        return Period.between(birthDate, LocalDate.now()).getYears();
     }
 }

@@ -18,22 +18,7 @@
                         <ng-container *ngFor="let field of section.fields">
                             <div [class]="field.width ? 'md:col-span-' + field.width : ''">
                                 <ng-container *ngIf="isFieldVisible(field)">
-                                    <app-field
-                                        [id]="field.fieldName"
-                                        [formGroup]="form"
-                                        [controlName]="field.fieldName"
-                                        [label]="field.fieldLabel"
-                                        [type]="field.fieldType"
-                                        [validators]="field.validators"
-                                        [placeholder]="field.placeholder"
-                                        [required]="field.required"
-                                        [options]="field.options || []"
-                                        [min]="field.min"
-                                        [max]="field.max"
-                                        [step]="field.step"
-                                        [suffix]="field.suffix"
-                                        [groupAddons]="field.groupAddons"
-                                    ></app-field>
+                                    <app-field [formGroup]="form" [controlName]="field.fieldName" [config]="field"></app-field>
                                 </ng-container>
                             </div>
                         </ng-container>
