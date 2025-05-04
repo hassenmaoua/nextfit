@@ -1,0 +1,65 @@
+services:
+  frontend:
+    build:
+      context: ../nextfit-ng
+      dockerfile: ../nextfit-ng/Dockerfile
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - spring-demo
+
+  backend:
+    build:
+      context: ../nextfit-backend
+      dockerfile: ../nextfit-backend/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/nextfit?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      ACTIVATION_URL: ${ACTIVATION_URL}
+      RESET_PASSWORD_URL: ${RESET_PASSWORD_URL}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+      FRONTEND_URL: ${FRONTEND_URL}
+    ports:
+      - "14040:14040" 
+    depends_on:
+      - db
+    networks:
+      - spring-demo
+
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nextfit
+    ports:
+      - "3306:3306"
+    volumes:
+      - nextfit_db:/var/lib/mysql
+    networks:
+      - spring-demo
+
+  mail-dev:
+    container_name: mail-dev-bsn
+    image: maildev/maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+    networks:
+      - spring-demo
+    restart: unless-stopped
+
+volumes:
+  nextfit_db:
+
+networks:
+  spring-demo:
+    driver: bridge
