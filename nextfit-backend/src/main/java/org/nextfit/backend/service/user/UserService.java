@@ -30,8 +30,8 @@ public class UserService implements IUserService {
         user.setPhone(request.getPhone());
         user.setCurrentActivity(request.getCurrentActivity());
         user.setWeight(request.getWeight());
-        user.setHeight(user.getHeight());
-        user.setGender(user.getGender());
+        user.setHeight(request.getHeight());
+        user.setGender(request.getGender());
         user.setRegistrationComplete(true);
 
         Utils.formatUserName(user);

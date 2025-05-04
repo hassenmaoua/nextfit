@@ -35,7 +35,6 @@ export const basicConfig: FormSectionConfig[] = [
                 max: 200,
                 suffix: ' KG',
                 validators: [
-                    { type: 'required', message: 'Target Weight is required' },
                     { type: 'min', value: 30, message: 'Minimum weight is 30' },
                     { type: 'max', value: 200, message: 'Maximum weight is 200' }
                 ]
@@ -111,9 +110,25 @@ export const basicConfig: FormSectionConfig[] = [
             },
             {
                 width: 6,
-                fieldName: 'motivationText',
+                fieldName: 'motivation',
                 fieldLabel: 'Why is this goal important to you?',
                 fieldType: 'textarea',
+                required: false
+            },
+            {
+                width: 3,
+                fieldName: 'exercisePreferences',
+                fieldLabel: 'Exercise Preferences',
+                fieldType: 'textarea',
+                placeholder: 'What exercises do you enjoy?',
+                required: false
+            },
+            {
+                width: 3,
+                fieldName: 'exerciseDislikes',
+                fieldLabel: 'Exercise Dislikes',
+                fieldType: 'textarea',
+                placeholder: 'What exercises do you avoid?',
                 required: false
             }
         ]

@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 import static org.nextfit.backend.handler.BusinessErrorCodes.*;
@@ -23,6 +25,34 @@ import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    // Handle InvalidInputException (Validation Errors)
+    @ExceptionHandler(InvalidInputException.class)
+    public ResponseEntity<ExceptionResponse> handleInvalidInput(InvalidInputException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse.builder()
+                        .businessErrorCode(BusinessErrorCodes.VALIDATION_ERROR.getCode())
+                        .businessErrorDescription(BusinessErrorCodes.VALIDATION_ERROR.getDescription())
+                        .message("Invalid request parameters")
+                        .validationErrors(extractValidationErrors(ex.getFieldErrors()))
+                        .errors(ex.getFieldErrors())
+                        .build());
+    }
+
+    // Handle PlanGenerationException
+    @ExceptionHandler(PlanGenerationException.class)
+    public ResponseEntity<ExceptionResponse> handlePlanGeneration(PlanGenerationException ex) {
+        BusinessErrorCodes errorCode = mapToBusinessError(ex.getErrorCode());
+
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(ExceptionResponse.builder()
+                        .businessErrorCode(errorCode.getCode())
+                        .businessErrorDescription(errorCode.getDescription())
+                        .message(ex.getMessage())
+                        .build());
+    }
 
     @ExceptionHandler(LockedException.class)
     public ResponseEntity<ExceptionResponse> handleException(LockedException exp) {
@@ -195,5 +225,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleJsonProcessingException(JsonProcessingException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body("Invalid JSON format: " + ex.getMessage());
+    }
+
+    // Helper methods
+    private Set<String> extractValidationErrors(Map<String, String> fieldErrors) {
+        return fieldErrors.entrySet().stream()
+                .map(entry -> entry.getKey() + ": " + entry.getValue())
+                .collect(Collectors.toSet());
+    }
+
+    private BusinessErrorCodes mapToBusinessError(PlanGenerationException.ErrorCode errorCode) {
+        return switch (errorCode) {
+            case AI_SERVICE_FAILURE -> BusinessErrorCodes.AI_SERVICE_UNAVAILABLE;
+            case DATA_STORAGE_ERROR -> BusinessErrorCodes.DATA_STORAGE_FAILURE;
+            case PROCESSING_TIMEOUT -> BusinessErrorCodes.PROCESSING_TIMEOUT;
+            default -> BusinessErrorCodes.GENERIC_ERROR;
+        };
     }
 }

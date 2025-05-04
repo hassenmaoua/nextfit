@@ -1,5 +1,7 @@
 package org.nextfit.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -25,6 +27,8 @@ public class PlanController {
     private final AccessService accessService;
 
     @PostMapping("/generate")
+    @Operation(summary = "Generate a fitness plan")
+    @ApiResponse(responseCode = "200", description = "Plan generated successfully")
     public ResponseEntity<PlanDTO> createPlan(@Valid @RequestBody PlanRequest request) {
         PlanEntity response;
 

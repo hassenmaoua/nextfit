@@ -17,6 +17,7 @@ export interface FieldConfig {
     defaultValue?: any;
     required?: boolean;
     validators?: FieldValidator[];
+    disabled?: boolean;
     options?: SelectOption[]; // For select/radio fields
     min?: number; // For number/range fields
     max?: number; // For number/range fields

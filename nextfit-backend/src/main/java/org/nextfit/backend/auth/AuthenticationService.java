@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.nextfit.backend.enumeration.TokenType;
 import org.nextfit.backend.enumeration.UserGender;
-import org.nextfit.backend.enumeration.UserRole;
 import org.nextfit.backend.entity.Token;
 import org.nextfit.backend.entity.User;
 import org.nextfit.backend.exception.ExpiredTokenException;
@@ -22,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

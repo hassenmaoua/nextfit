@@ -39,8 +39,8 @@ import { Tooltip } from 'primeng/tooltip';
                 tabindex="0"
                 pRipple
             >
-                <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
-                <span [pTooltip]="item.label" showDelay="500" fitContent="false" tooltipPosition="right" [tooltipDisabled]="(item.label?.length ?? 0) < 35" class="layout-menuitem-text">{{ item.label }}</span>
+                <i *ngIf="item.icon" [ngClass]="item.icon" class="layout-menuitem-icon"></i>
+                <span [pTooltip]="item.label" showDelay="500" fitContent="false" tooltipPosition="right" [tooltipDisabled]="(item.label?.length ?? 0) < 30" class="layout-menuitem-text">{{ item.label }}</span>
                 <i class="pi pi-fw pi-angle-down layout-submenu-toggler" *ngIf="item.items"></i>
                 <span *ngIf="item.badge" class="menu-badge">{{ item.badge }}</span>
                 <i *ngIf="item.disabled" class="pi pi-lock menu-lock"></i>

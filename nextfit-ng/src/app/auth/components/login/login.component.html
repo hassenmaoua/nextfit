@@ -29,7 +29,7 @@
         <p-iconfield class="w-full">
             <p-inputicon class="pi pi-envelope"></p-inputicon>
 
-            <input pInputText id="email" type="text" placeholder="Email address" class="w-full md:w-[30rem] mb-1" formControlName="email" [ngClass]="{ 'p-invalid': f['email'].touched && f['email'].errors }" />
+            <input pInputText [pAutoFocus]="true" id="email" type="text" placeholder="Email address" class="w-full md:w-[30rem] mb-1" formControlName="email" [ngClass]="{ 'p-invalid': f['email'].touched && f['email'].errors }" />
         </p-iconfield>
         <small *ngIf="f['email'].errors?.['required'] && f['email'].touched" class="p-error">Email is required</small>
     </div>

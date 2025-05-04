@@ -68,9 +68,27 @@ public class BasicPlanRequest implements PlanRequest {
     @Schema(description = "User's current fitness level", example = "Beginner")
     private String currentLevel;
 
-
+    @Schema(
+            description = "User's specific exercise preferences (types of exercises they particularly enjoy)",
+            example = "Bench press, Squat"
+    )
     private String exercisePreferences;
+
+    @Schema(
+            description = "Types of exercises the user dislikes or wants to avoid",
+            example = "Burpees, Running"
+    )
     private String exerciseDislikes;
+
+    @Schema(
+            description = "User's previous experience with fitness programs or sports",
+            example = "I did yoga for 2 years but stopped 6 months ago"
+    )
     private String previousExperience;
+
+    @Schema(
+            description = "Any other considerations the AI model should know about",
+            example = "I have occasional lower back pain and mild asthma"
+    )
     private String otherConcerns;
 }

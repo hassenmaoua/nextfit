@@ -1,5 +1,6 @@
 package org.nextfit.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.nextfit.backend.enumeration.PlanLevel;
 import org.nextfit.backend.model.support.InfoSection;
 
@@ -14,6 +15,7 @@ import org.nextfit.backend.model.support.WorkoutEntry;
 public final class BasicPlan extends InfoSection implements PlanType {
     private PlanLevel type = PlanLevel.BASIC;
 
+    @JsonProperty(value = "workouts", required = true)
     private List<WorkoutEntry> workouts;
 
     @Override

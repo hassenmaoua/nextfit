@@ -1,6 +1,5 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { MenuItem } from 'primeng/api';
-import { Router, RouterModule } from '@angular/router';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
@@ -97,39 +96,15 @@ import { AppProfile } from './app.profile';
     </div>`
 })
 export class AppTopbar implements OnInit, AfterViewInit {
-    items!: MenuItem[];
     visible: boolean = false;
     name!: string;
 
     constructor(
         public layoutService: LayoutService,
-        private authService: AuthService,
-        private router: Router
+        private authService: AuthService
     ) {}
 
-    ngOnInit() {
-        this.items = [
-            {
-                label: 'Profile',
-                items: [
-                    {
-                        label: 'Settings',
-                        icon: 'pi pi-cog',
-                        command: () => {
-                            this.showDialog();
-                        }
-                    },
-                    {
-                        label: 'Logout',
-                        icon: 'pi pi-sign-out',
-                        command: () => {
-                            this.authService.logout();
-                        }
-                    }
-                ]
-            }
-        ];
-    }
+    ngOnInit() {}
 
     ngAfterViewInit(): void {
         this.name = this.authService.currentUser?.firstName || '';

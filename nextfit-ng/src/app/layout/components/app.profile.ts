@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, HostBinding, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { MenuModule } from 'primeng/menu';
+import { Menu, MenuModule } from 'primeng/menu';
 import { BadgeModule } from 'primeng/badge';
 import { RippleModule } from 'primeng/ripple';
 import { AvatarModule } from 'primeng/avatar';
@@ -19,18 +19,19 @@ import { profileConfig } from '../../core/profile-form.config';
 import { UserService } from '../../services/user.service';
 import { FieldService } from '../../services/field.service';
 import { ConfirmPasswordValidator } from '../../auth/initializer/confirm-password.validator';
+import { PopoverModule } from 'primeng/popover';
 
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, MenuModule, BadgeModule, RippleModule, AvatarModule, DialogModule, PasswordModule, FloatLabelModule, ReactiveFormsModule, ButtonModule, FieldComponent, ButtonModule, FieldComponent],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, MenuModule, BadgeModule, RippleModule, AvatarModule, DialogModule, PasswordModule, FloatLabelModule, ReactiveFormsModule, ButtonModule, FieldComponent, FieldComponent, PopoverModule],
     template: `
-        <button type="button" (click)="menu.toggle($event)" class="layout-topbar-action">
+        <button class="layout-topbar-action" (click)="toggleMenu($event)">
             <i class="pi pi-user"></i>
             <span>Profile</span>
         </button>
 
-        <p-menu #menu [model]="items" [popup]="true" styleClass="w-full md:w-60" [style]="{ top: '0 !important' }">
+        <p-menu #menu [model]="items" [popup]="true" styleClass="w-full md:w-60">
             <ng-template #start>
                 <div pRipple class="flex flex-column items-center justify-start p-2 pt-4">
                     <p-avatar [label]="(user?.firstName?.slice(0, 1) || 'A').toUpperCase()" styleClass="mr-2" shape="circle" />
@@ -46,8 +47,8 @@ import { ConfirmPasswordValidator } from '../../auth/initializer/confirm-passwor
             </ng-template>
             <ng-template #item let-item>
                 <a pRipple class="flex items-center p-menu-item-link">
-                    <span [class]="item.icon"></span>
-                    <span class="ml-2">{{ item.label }}</span>
+                    <span [ngClass]="item.styleClass" [class]="item.icon"></span>
+                    <span [ngClass]="item.styleClass" class="ml-2">{{ item.label }}</span>
                     <p-badge *ngIf="item.badge" class="ml-auto" [value]="item.badge" />
                     <span *ngIf="item.shortcut" class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1">
                         {{ item.shortcut }}
@@ -97,7 +98,8 @@ import { ConfirmPasswordValidator } from '../../auth/initializer/confirm-passwor
         </p-dialog>
     `
 })
-export class AppProfile implements OnInit, OnDestroy {
+export class AppProfile implements OnInit, AfterViewInit, OnDestroy {
+    @ViewChild('menu') menu!: Menu;
     private unsubscribe: Subscription[] = [];
 
     fields: FieldConfig[] = profileConfig;
@@ -120,7 +122,7 @@ export class AppProfile implements OnInit, OnDestroy {
     ];
 
     constructor(
-        private fb: FormBuilder,
+        private renderer: Renderer2,
         private authService: AuthService,
         private fieldService: FieldService,
         private userService: UserService
@@ -156,14 +158,12 @@ export class AppProfile implements OnInit, OnDestroy {
                     {
                         label: 'Logout',
                         icon: 'pi pi-sign-out',
+                        styleClass: 'text-red-500',
                         command: () => {
                             this.authService.logout();
                         }
                     }
                 ]
-            },
-            {
-                separator: true
             }
         ];
     }
@@ -257,5 +257,19 @@ export class AppProfile implements OnInit, OnDestroy {
 
     showSettingsDialog() {
         this.settingsVisible = true;
+    }
+
+    toggleMenu(event: MouseEvent) {
+        this.menu.toggle(event);
+
+        setTimeout(() => {
+            const menuElement = document.querySelector('.p-menu') as HTMLElement;
+
+            if (menuElement) {
+                if (this.menu.visible) {
+                    this.renderer.setStyle(menuElement, 'top', '3.5rem');
+                }
+            }
+        }, 0);
     }
 }

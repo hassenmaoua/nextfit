@@ -1,5 +1,7 @@
 package org.nextfit.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Getter;
 import lombok.Setter;
 import org.nextfit.backend.enumeration.PlanLevel;
@@ -11,7 +13,12 @@ import java.util.List;
 @Setter
 public class Plan<T extends PlanType> extends InfoSection {
     private PlanLevel level;
+
+    @JsonProperty(value = "planConcept", required = true)
+    @JsonPropertyDescription("Describes the core idea or theme of the plan. For example: 'Build muscle with bodyweight training' or 'Eat clean to lose fat'. Should be short, motivational, and relevant to the plan goal.")
     private String planConcept;
+
+    @JsonProperty(value = "weeklySchedules", required = true)
     private List<T> weeklySchedules;
 
     // Constructor with manual level detection
