@@ -7,7 +7,7 @@ import imports from './imports';
 import { firstValueFrom, Observable } from 'rxjs';
 import { FieldComponent } from '../../shared/components/field/field.component';
 import { PlanLevel } from '../../models/plan';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { PlanService } from '../../services/plan.service';
 import { buttons } from '../../pages/home/home.component';
 import { MenuService } from '../../layout/service/menu.service';
@@ -45,7 +45,7 @@ export class FormBuilderComponent implements OnInit {
         this.options = ['BASIC', 'MEAL', 'DUAL', 'NUTRITION', 'PREMIUM'];
 
         // Validate the query parameter
-        this.route.queryParams.subscribe((params) => {
+        this.route.queryParams.subscribe((params: Params) => {
             const planParam = params['plan'] || PlanLevel.BASIC;
 
             if (planParam) {
@@ -53,6 +53,11 @@ export class FormBuilderComponent implements OnInit {
                 const isValidPlan = Object.values(PlanLevel).includes(planParam);
 
                 if (isValidPlan) {
+                    if (planParam == PlanLevel.NUTRITION || planParam == PlanLevel.PREMIUM) {
+                        this.router.navigate(['/error/notavailable']);
+                        return;
+                    }
+
                     this.planLevel = planParam as PlanLevel;
                     this.pageTitle = this.getPageTitle(planParam);
                 } else {
@@ -83,6 +88,14 @@ export class FormBuilderComponent implements OnInit {
         }
     }
 
+    onPlanLevelChange() {
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { plan: this.planLevel },
+            queryParamsHandling: 'merge'
+        });
+    }
+
     get f() {
         return this.form.controls;
     }
@@ -98,9 +111,8 @@ export class FormBuilderComponent implements OnInit {
             header: 'Are you sure?',
             message: 'Please confirm to proceed.',
             accept: () => {
-                // this.formService.startLoading();
-                // this.generatePlan(this.planLevel, this.form.value);
-                console.log(this.form.value);
+                this.formService.startLoading();
+                this.generatePlan(this.planLevel, this.form.value);
             }
         });
     }

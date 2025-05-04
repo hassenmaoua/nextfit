@@ -133,7 +133,7 @@
 </ng-template>
 
 <ng-template #basicTemplate let-week="week">
-    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-white/10">
+    <div class="mt-5 overflow-x-auto rounded-xl border border-slate-200 dark:border-white/10">
         <p-table [value]="week.workouts" scrollHeight="40rem" class="min-w-[600px] w-full text-slate-800 dark:text-white" rowGroupMode="subheader" groupRowsBy="day" [customSort]="true" [tableStyle]="{ 'min-width': '30rem' }">
             <ng-template #header>
                 <tr class="text-slate-800 dark:text-white">
@@ -146,8 +146,9 @@
             <ng-template #groupheader let-workout>
                 <tr pRowGroupHeader class="bg-slate-50 dark:bg-slate-900">
                     <td colspan="4" class="py-2 px-4 font-bold">
-                        {{ workout.headline }}
-                        <span class="text-slate-500 dark:text-slate-300 font-normal ml-2">{{ workout.subtitle }}</span>
+                        {{ workout.day }}
+                        <span class="font-normal ml-2">{{ workout.headline }}</span>
+                        <span *ngIf="workout.subtitle" class="text-slate-500 dark:text-slate-300 font-normal ml-2">- {{ workout.subtitle }}</span>
                     </td>
                 </tr>
             </ng-template>

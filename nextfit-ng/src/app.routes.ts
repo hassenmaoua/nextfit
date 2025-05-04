@@ -29,7 +29,7 @@ export const appRoutes: Routes = [
         path: 'error',
         component: Error,
         children: [
-            { path: '', component: NotAvailable },
+            { path: 'notavailable', component: NotAvailable }, // Changed this line
             { path: 'notfound', component: Notfound },
             { path: 'access', component: Access }
         ]

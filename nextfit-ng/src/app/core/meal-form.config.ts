@@ -63,6 +63,7 @@ export const mealConfig: FormSectionConfig[] = [
                 fieldLabel: 'Daily Calorie Goal',
                 fieldType: 'number',
                 suffix: ' kcal',
+                step: 100,
                 min: 1000,
                 max: 5000,
                 defaultValue: 2200,
@@ -89,60 +90,80 @@ export const mealConfig: FormSectionConfig[] = [
             },
             {
                 width: 2,
-                fieldName: 'goalWeight',
+                defaultValue: 75,
+                fieldName: 'targetWeight',
                 fieldLabel: 'Target Weight',
                 fieldType: 'number',
-                suffix: 'kg',
-                min: 30,
-                max: 250,
                 required: false,
-                placeholder: 'e.g. 65'
-            }
-        ]
-    },
-    {
-        id: 'mealTiming',
-        label: 'Mealtime Preferences',
-        description: 'Tell us when and how you prefer to eat.',
-        size: 6,
-        fields: [
+                min: 30,
+                max: 200,
+                suffix: ' KG',
+                validators: [
+                    { type: 'min', value: 30, message: 'Minimum weight is 30' },
+                    { type: 'max', value: 200, message: 'Maximum weight is 200' }
+                ]
+            },
             {
                 width: 3,
-                fieldName: 'breakfastTime',
-                fieldLabel: 'Preferred Breakfast Time',
-                fieldType: 'time',
-                placeholder: 'e.g. 08:00 AM',
+                fieldName: 'foodAllergies',
+                fieldLabel: 'Allergies',
+                fieldType: 'textarea',
+                placeholder: 'E.g. peanuts, shellfish, gluten...',
                 required: false
             },
             {
                 width: 3,
-                fieldName: 'lunchTime',
-                fieldLabel: 'Preferred Lunch Time',
-                fieldType: 'time',
-                placeholder: 'e.g. 01:00 PM',
+                fieldName: 'preferredFoods',
+                fieldLabel: 'Favorite Ingredients or Meals',
+                fieldType: 'textarea',
+                placeholder: 'E.g. chicken, sweet potatoes...',
                 required: false
-            },
-            {
-                width: 3,
-                fieldName: 'dinnerTime',
-                fieldLabel: 'Preferred Dinner Time',
-                fieldType: 'time',
-                placeholder: 'e.g. 07:00 PM',
-                required: false
-            },
-            {
-                width: 3,
-                fieldName: 'snackPreference',
-                fieldLabel: 'Do you like snacks?',
-                fieldType: 'radio',
-                defaultValue: true,
-                options: [
-                    { label: 'Yes', value: true },
-                    { label: 'No', value: false }
-                ],
-                required: true,
-                validators: [{ type: 'required', message: 'Please choose an option' }]
             }
         ]
     }
+    // {
+    //     id: 'mealTiming',
+    //     label: 'Mealtime Preferences',
+    //     description: 'Tell us when and how you prefer to eat.',
+    //     size: 6,
+    //     fields: [
+    //         {
+    //             width: 3,
+    //             fieldName: 'breakfastTime',
+    //             fieldLabel: 'Preferred Breakfast Time',
+    //             fieldType: 'time',
+    //             placeholder: 'e.g. 08:00 AM',
+    //             required: false
+    //         },
+    //         {
+    //             width: 3,
+    //             fieldName: 'lunchTime',
+    //             fieldLabel: 'Preferred Lunch Time',
+    //             fieldType: 'time',
+    //             placeholder: 'e.g. 01:00 PM',
+    //             required: false
+    //         },
+    //         {
+    //             width: 3,
+    //             fieldName: 'dinnerTime',
+    //             fieldLabel: 'Preferred Dinner Time',
+    //             fieldType: 'time',
+    //             placeholder: 'e.g. 07:00 PM',
+    //             required: false
+    //         },
+    //         {
+    //             width: 3,
+    //             fieldName: 'snackPreference',
+    //             fieldLabel: 'Do you like snacks?',
+    //             fieldType: 'radio',
+    //             defaultValue: true,
+    //             options: [
+    //                 { label: 'Yes', value: true },
+    //                 { label: 'No', value: false }
+    //             ],
+    //             required: true,
+    //             validators: [{ type: 'required', message: 'Please choose an option' }]
+    //         }
+    //     ]
+    // }
 ];

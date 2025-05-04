@@ -76,7 +76,7 @@
                 box-shadow var(--element-transition-duration);
 
             .layout-menuitem-icon {
-                margin-right: 0.5rem;
+                margin-left: 0.5rem;
             }
 
             .layout-submenu-toggler {
@@ -92,7 +92,6 @@
 
             &:hover {
                 background-color: var(--surface-hover);
-                transform: translateX(4px);
                 box-shadow: 0 0 10px rgba(0, 255, 255, 0.05);
             }
 
@@ -148,6 +147,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
 }
 
 .layout-submenu-enter-from,

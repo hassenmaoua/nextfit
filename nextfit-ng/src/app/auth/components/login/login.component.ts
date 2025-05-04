@@ -12,10 +12,11 @@ import { AuthService } from '../../services/auth.service';
 import { LoadingService } from '../../../shared/services/loading.service';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
+import { AutoFocusModule } from 'primeng/autofocus';
 
 @Component({
     selector: 'app-login',
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, RouterModule, RippleModule, CommonModule, FormsModule, ReactiveFormsModule, IconFieldModule, InputIconModule],
+    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, RouterModule, RippleModule, CommonModule, FormsModule, ReactiveFormsModule, IconFieldModule, InputIconModule, AutoFocusModule],
     templateUrl: './login.component.html',
     styleUrl: '../../styles.scss'
 })

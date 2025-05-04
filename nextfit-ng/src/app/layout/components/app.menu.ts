@@ -4,16 +4,15 @@ import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
 import { DividerModule } from 'primeng/divider';
-import { AuthService } from '../../auth/services/auth.service';
 import { Skeleton } from 'primeng/skeleton';
-import { PlanService } from '../../services/plan.service';
 import { PlanDTO } from '../../models/dto';
 import { MenuService } from '../service/menu.service';
+import { MenuModule } from 'primeng/menu';
 
 @Component({
     selector: 'app-menu',
     standalone: true,
-    imports: [CommonModule, DividerModule, AppMenuitem, RouterModule, Skeleton],
+    imports: [CommonModule, DividerModule, AppMenuitem, RouterModule, Skeleton, MenuModule],
     template: `<ul class="layout-menu">
         <ng-container *ngFor="let item of model; let i = index">
             <li app-menuitem *ngIf="!item.separator" [item]="item" [index]="i" [root]="true"></li>
@@ -24,7 +23,7 @@ import { MenuService } from '../service/menu.service';
                 <p-skeleton height="18px" [width]="item + 'px'" styleClass="mb-2" />
             </li>
         </ng-container>
-    </ul> `
+    </ul>`
 })
 export class AppMenu {
     model: MenuItem[] = [];

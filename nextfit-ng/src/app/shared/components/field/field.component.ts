@@ -66,6 +66,7 @@ export class FieldComponent implements OnInit {
             this.label = this.label ?? this.config.fieldLabel;
             this.placeholder = this.placeholder ?? this.config.placeholder ?? '';
             this.required = this.required ?? this.config.required ?? false;
+            this.disabled = this.disabled ?? this.config.disabled ?? false;
             this.validators = this.validators ?? this.config.validators ?? [];
             this.options = this.options.length > 0 ? this.options : (this.config.options ?? []);
             this.min = this.min ?? this.config.min;

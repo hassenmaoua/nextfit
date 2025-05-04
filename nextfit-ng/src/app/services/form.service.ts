@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, filter, Observable, of } from 'rxjs';
 import { FormSectionConfig } from '../models/form-builder/form-config.model';
 import { PlanLevel } from '../models/plan';
 import { personalSectionConfig } from './data';
@@ -9,6 +9,8 @@ import { mealConfig } from '../core/meal-form.config';
 import { basicPreferencesConfig } from '../core/basic-preferences.config';
 import { mealPreferencesConfig } from '../core/meal-preferences.config';
 import { FieldService } from './field.service';
+import { AuthService } from '../auth/services/auth.service';
+import { UserDTO } from '../auth/models/user.model';
 
 @Injectable({
     providedIn: 'root'
@@ -36,16 +38,30 @@ export class FormService {
 
     constructor(
         private fb: FormBuilder,
-        private fieldService: FieldService
+        private fieldService: FieldService,
+        private authService: AuthService
     ) {}
+
+    isUserKey(key: string, user: UserDTO): key is keyof UserDTO {
+        return key in (user || {});
+    }
 
     // Simulate API call to get form configuration
     getFormConfig(level: string): Observable<FormSectionConfig[]> {
-        const basicPlanConfig: FormSectionConfig[] = [personalSectionConfig, ...basicConfig, ...basicPreferencesConfig];
+        const currentUser = this.authService.currentUser;
+        personalSectionConfig.fields.forEach((field) => {
+            if (currentUser && this.isUserKey(field.fieldName, currentUser)) {
+                field.defaultValue = currentUser[field.fieldName];
+            }
+        });
 
-        const meanlPlanConfig: FormSectionConfig[] = [personalSectionConfig, ...mealConfig, ...mealPreferencesConfig];
+        const personalConfig = {};
 
-        const dualConfig: FormSectionConfig[] = [personalSectionConfig, ...basicConfig, ...mealConfig, ...basicPreferencesConfig, ...mealPreferencesConfig];
+        const basicPlanConfig: FormSectionConfig[] = [personalSectionConfig, ...basicConfig];
+
+        const meanlPlanConfig: FormSectionConfig[] = [personalSectionConfig, ...mealConfig];
+
+        const dualConfig: FormSectionConfig[] = [personalSectionConfig, ...basicConfig, ...mealConfig];
 
         const nutritionConfig: FormSectionConfig[] = [personalSectionConfig];
 

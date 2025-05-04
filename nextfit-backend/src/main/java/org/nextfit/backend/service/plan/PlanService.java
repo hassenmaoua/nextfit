@@ -1,10 +1,13 @@
 package org.nextfit.backend.service.plan;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.nextfit.backend.dto.requests.*;
 import org.nextfit.backend.dto.responses.*;
 import org.nextfit.backend.dto.*;
 import org.nextfit.backend.enumeration.PlanLevel;
+import org.nextfit.backend.exception.InvalidInputException;
+import org.nextfit.backend.exception.PlanGenerationException;
 import org.nextfit.backend.model.BasicPlan;
 import org.nextfit.backend.model.DualPlan;
 import org.nextfit.backend.model.MealPlan;
@@ -25,15 +28,20 @@ import org.nextfit.backend.repository.PlanRepository;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PlanService implements IPlanService {
     private final ChatClient chatClient;
     private final PlanRepository planRepository;
@@ -93,77 +101,179 @@ public class PlanService implements IPlanService {
 
     @Override
     public BasicPlanResponse generateBasicPlan(BasicPlanRequest form) {
+        log.debug("Starting BASIC plan generation");
         try {
+            // 1. Create prompts
             PromptTemplate template = getBasicPrompt(form);
-
             UserMessage userMessage = (UserMessage) template.createMessage();
+            log.debug("Created BASIC plan user message : {}", userMessage);
 
-            var outputConverter = new BeanOutputConverter(BasicPlanResponse.class);
-            SystemPromptTemplate systemPrompt = new SystemPromptTemplate(basicSystemPrompt);
+            var outputConverter = new BeanOutputConverter<>(BasicPlanResponse.class);
+            SystemMessage systemMessage = (SystemMessage) new SystemPromptTemplate(basicSystemPrompt)
+                    .createMessage(Map.of("format", outputConverter.getFormat()));
+            log.debug("BASIC plan system message prepared : {}", systemMessage);
 
-            SystemMessage systemMessage = (SystemMessage) systemPrompt.createMessage(Map.of("format", outputConverter.getFormat()));
-
+            // 2. Execute AI call
             Prompt prompt = new Prompt(List.of(userMessage, systemMessage));
 
-            ChatResponse aiResponse = chatClient.prompt(prompt).call().chatResponse();
+            ChatResponse aiResponse = chatClient.prompt(prompt)
+                    .call()
+                    .chatResponse();
 
-            String textResult = "";
-            if (aiResponse != null) {
-                textResult = aiResponse.getResult().getOutput().getText();
+            // 3. Handle response scenarios
+            if (aiResponse == null || aiResponse.getResult() == null) {
+                log.error("Received null response from AI service");
+                throw new RuntimeException("No response received from AI service");
             }
 
-            return (BasicPlanResponse) outputConverter.convert(textResult);
+            String textResult = aiResponse.getResult().getOutput().getText();
+            log.debug("Raw AI response text for BASIC plan: {}", textResult);
+
+            // 4. Check for validation errors from system message
+            if (textResult.contains("Invalid input detected")) {
+                log.warn("Detected validation errors in AI response");
+
+                Pattern pattern = Pattern.compile("Invalid input detected in \\[(.*?)]: (.*?)\\. This field should");
+                Matcher matcher = pattern.matcher(textResult);
+
+                Map<String, String> errors = new HashMap<>();
+                while (matcher.find()) {
+                    errors.put(matcher.group(1), matcher.group(2));
+                }
+
+                throw new InvalidInputException("Invalid input fields detected", errors);
+            }
+
+            // 5. Convert successful response
+            try {
+                BasicPlanResponse response = outputConverter.convert(textResult);
+                if (response != null) {
+                    response.setLevel(PlanLevel.BASIC);
+                }
+                log.debug("Successfully converted to BasicPlanResponse : {}", response);
+                return response;
+            } catch (Exception conversionError) {
+                log.error("Failed to convert to BasicPlanResponse. Raw text: {}", textResult, conversionError);
+                throw new RuntimeException("The generated plan format was invalid", conversionError);
+            }
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to generate basic workout plan", e);
+            log.error("Plan generation failed for request: {}", form, e);
+            throw new PlanGenerationException("Failed to generate workout plan. Please try again later.");
+        } finally {
+            log.debug("Completed BASIC plan generation attempt");
         }
     }
 
     private PromptTemplate getBasicPrompt(BasicPlanRequest form) {
         PromptTemplate template = new PromptTemplate(basicPrompt);
 
+        // Required preferences
         template.add("exerciseTypes", String.join(", ", form.getExerciseTypes()));
         template.add("timelineWeeks", form.getTimelineWeeks());
         template.add("primaryGoal", form.getPrimaryGoal());
         template.add("hasGymAccess", form.isHasGymAccess() ? "do" : "do not");
-        template.add("targetWeight", form.getTargetWeight() > 0 ? "my target weight is " + form.getTargetWeight() + " KG" : "");
         template.add("exerciseFrequency", form.getExerciseFrequency());
-        template.add("motivation", form.getMotivation() != null ? "My motivation is " + form.getMotivation() : "");
 
+        // Profile information
         template.add("age", form.getAge());
         template.add("gender", form.getGender());
         template.add("height", form.getHeight());
         template.add("weight", form.getWeight());
         template.add("currentLevel", form.getCurrentLevel());
 
+        // Optional fields with null checks
+        template.add("targetWeight",
+                form.getTargetWeight() > 0 ? "My target weight is " + form.getTargetWeight() + " KG, " : "");
+
+        template.add("motivation",
+                StringUtils.hasText(form.getMotivation()) ?
+                        "My motivation is " + form.getMotivation() :
+                        "");
+
+        template.add("exercisePreferences",
+                StringUtils.hasText(form.getExercisePreferences()) ?
+                        "I prefer to include these exercises among the workout's exercises : " + form.getExercisePreferences() + ". " :
+                        "");
+
+        template.add("exerciseDislikes",
+                StringUtils.hasText(form.getExerciseDislikes()) ?
+                        "I dislike these exercises, do not include them : " + form.getExerciseDislikes() + ". " :
+                        "");
+
+        template.add("previousExperience",
+                StringUtils.hasText(form.getPreviousExperience()) ?
+                        "I had previous Fitness Experience : " + form.getPreviousExperience() + ", " :
+                        "");
+
+        template.add("otherConcerns",
+                StringUtils.hasText(form.getOtherConcerns()) ?
+                        "I have these considerations : " + form.getOtherConcerns() + "." :
+                        "");
+
         return template;
     }
 
     @Override
     public MealPlanResponse generateMealPlan(MealPlanRequest form) {
+        log.debug("Starting MEAL plan generation");
         try {
+            // 1. Create prompts
             PromptTemplate template = getMealPrompt(form);
-
             UserMessage userMessage = (UserMessage) template.createMessage();
+            log.debug("Created MEAL plan user message : {}", userMessage);
 
-            var outputConverter = new BeanOutputConverter(MealPlanResponse.class);
-            SystemPromptTemplate systemPrompt = new SystemPromptTemplate(mealSystemPrompt);
-            SystemMessage systemMessage = (SystemMessage) systemPrompt.createMessage(Map.of("format", outputConverter.getFormat()));
+            var outputConverter = new BeanOutputConverter<>(MealPlanResponse.class);
+            SystemMessage systemMessage = (SystemMessage) new SystemPromptTemplate(mealSystemPrompt)
+                    .createMessage(Map.of("format", outputConverter.getFormat()));
+            log.debug("MEAL plan system message prepared : {}", outputConverter.getFormat());
 
+            // 2. Execute AI call
             Prompt prompt = new Prompt(List.of(userMessage, systemMessage));
 
-            ChatResponse aiResponse = chatClient.prompt(prompt).call().chatResponse();
+            ChatResponse aiResponse = chatClient.prompt(prompt)
+                    .call()
+                    .chatResponse();
 
-            String textResult = "";
-
-            if (aiResponse != null) {
-                textResult = aiResponse.getResult().getOutput().getText();
+            // 3. Handle response scenarios
+            if (aiResponse == null || aiResponse.getResult() == null) {
+                log.error("Received null response from AI service");
+                throw new RuntimeException("No response received from AI service");
             }
 
-            return (MealPlanResponse) outputConverter.convert(textResult);
+            String textResult = aiResponse.getResult().getOutput().getText();
+            log.debug("Raw AI response text for MEAL plan: {}", textResult);
+
+            // 4. Check for validation errors from system message
+//            if (textResult.contains("Invalid input detected")) {
+//                log.warn("Detected validation errors in AI response");
+//
+//                Pattern pattern = Pattern.compile("Invalid input detected in \\[(.*?)]: (.*?)\\. This field should");
+//                Matcher matcher = pattern.matcher(textResult);
+//
+//                Map<String, String> errors = new HashMap<>();
+//                while (matcher.find()) {
+//                    errors.put(matcher.group(1), matcher.group(2));
+//                }
+//
+//                throw new InvalidInputException("Invalid input fields detected", errors);
+//            }
+
+            // 5. Convert successful response
+            try {
+                MealPlanResponse response = outputConverter.convert(textResult);
+                log.debug("Successfully converted to MealPlanResponse : {}", response);
+                return response;
+            } catch (Exception conversionError) {
+                log.error("Failed to convert to MealPlanResponse. Raw text: {}", textResult, conversionError);
+                throw new RuntimeException("The generated plan format was invalid", conversionError);
+            }
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to generate meal plan", e);
+            log.error("Plan generation failed for request: {}", form, e);
+            throw new PlanGenerationException("Failed to generate workout plan. Please try again later.");
+        } finally {
+            log.debug("Completed MEAL plan generation attempt");
         }
     }
 
@@ -210,7 +320,6 @@ public class PlanService implements IPlanService {
             UserMessage contextMessage = (UserMessage) mealPrompt.createMessage();
 
             UserMessage userMessage = new UserMessage(contextMessage.getText() + "The meal plans is a complementary support these workouts :\n" + workoutContext);
-
 
 
             // 3. Prepare AI prompt with output formatting
