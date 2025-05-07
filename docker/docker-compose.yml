@@ -41,7 +41,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: nextfit
     ports:
-      - "3306:3306"
+      - "3333:3306"
     volumes:
       - nextfit_db:/var/lib/mysql
     networks:

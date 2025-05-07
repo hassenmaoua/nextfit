@@ -31,10 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -262,6 +259,9 @@ public class PlanService implements IPlanService {
             // 5. Convert successful response
             try {
                 MealPlanResponse response = outputConverter.convert(textResult);
+                if (response != null) {
+                    response.setLevel(PlanLevel.MEAL);
+                }
                 log.debug("Successfully converted to MealPlanResponse : {}", response);
                 return response;
             } catch (Exception conversionError) {
@@ -284,7 +284,7 @@ public class PlanService implements IPlanService {
         template.add("dietType", form.getDietType());
         template.add("mealFrequency", form.getMealFrequency());
         template.add("calorieTarget", form.getCalorieTarget());
-        template.add("goalWeight", form.getGoalWeight() != null ? form.getGoalWeight() : "");
+        template.add("goalWeight", form.getTargetWeight() != null ? form.getTargetWeight() : "");
         template.add("currentActivity", form.getCurrentActivity());
         template.add("bodyType", form.getBodyType());
         template.add("age", form.getAge());
@@ -293,14 +293,7 @@ public class PlanService implements IPlanService {
         template.add("gender", form.getGender() != null ? form.getGender().toString() : "");
 
         template.add("foodAllergies", form.getFoodAllergies() != null ? form.getFoodAllergies() : "");
-        template.add("dislikedFoods", form.getDislikedFoods() != null ? form.getDislikedFoods() : "");
         template.add("preferredFoods", form.getPreferredFoods() != null ? form.getPreferredFoods() : "");
-        template.add("excludedCategories", form.getExcludedCategories() != null ? form.getExcludedCategories() : "");
-
-        template.add("breakfastTime", form.getBreakfastTime() != null ? form.getBreakfastTime() : "");
-        template.add("lunchTime", form.getLunchTime() != null ? form.getLunchTime() : "");
-        template.add("dinnerTime", form.getDinnerTime() != null ? form.getDinnerTime() : "");
-        template.add("snackPreference", form.getSnackPreference() != null && form.getSnackPreference() ? "yes" : "no");
 
         return template;
     }
@@ -319,7 +312,8 @@ public class PlanService implements IPlanService {
             // Improved prompt with workout context
             UserMessage contextMessage = (UserMessage) mealPrompt.createMessage();
 
-            UserMessage userMessage = new UserMessage(contextMessage.getText() + "The meal plans is a complementary support these workouts :\n" + workoutContext);
+            UserMessage userMessage = new UserMessage(contextMessage.getText() + "The meal plans is a complementary support these workouts :\n" + workoutContext +
+                    "\nThe plan should have equal weeklySchedules size to workouts");
 
 
             // 3. Prepare AI prompt with output formatting
@@ -366,43 +360,55 @@ public class PlanService implements IPlanService {
     ) {
         DualPlanResponse response = new DualPlanResponse();
 
-        // Copy metadata from meal plan (or combine from both)
+
         response.setLevel(PlanLevel.DUAL);
         response.setHeadline("Dual Plan: " + mealPlan.getHeadline());
         response.setSubtitle(mealPlan.getSubtitle());
         response.setPlanConcept(
-                "Combined workout and nutrition plan\n" +
-                        mealPlan.getPlanConcept() +
-                        "\nThe workout and diet nutrition plans should have same weeks durations"
+                "Combined workout and nutrition plan\n" + mealPlan.getPlanConcept()
         );
 
-
-        // Merge weekly schedules
         List<DualPlan> weeklyPlans = new ArrayList<>();
 
-        // Verify both plans have matching durations
-        if (basicPlan.getWeeklySchedules().size() != mealPlan.getWeeklySchedules().size()) {
-            throw new IllegalStateException("Workout and meal plans have different durations");
+        List<BasicPlan> workoutSchedules = basicPlan.getWeeklySchedules();
+        List<MealPlan> mealSchedules = mealPlan.getWeeklySchedules();
 
-        }
+        int maxSize = Math.max(workoutSchedules.size(), mealSchedules.size());
 
-
-        // Combine daily entries
-        for (int i = 0; i < basicPlan.getWeeklySchedules().size(); i++) {
-            BasicPlan workoutDay = basicPlan.getWeeklySchedules().get(i);
-            MealPlan mealDay = mealPlan.getWeeklySchedules().get(i);
+        for (int i = 0; i < maxSize; i++) {
+            BasicPlan workoutDay = i < workoutSchedules.size() ? workoutSchedules.get(i) : createEmptyBasicPlan();
+            MealPlan mealDay = i < mealSchedules.size() ? mealSchedules.get(i) : createEmptyMealPlan();
 
             DualPlan dualDay = new DualPlan();
             dualDay.setHeadline(workoutDay.getHeadline());
             dualDay.setSubtitle(workoutDay.getSubtitle());
             dualDay.setWorkouts(workoutDay.getWorkouts());
             dualDay.setDiets(mealDay.getDiets());
+
             weeklyPlans.add(dualDay);
         }
 
         response.setWeeklySchedules(weeklyPlans);
         return response;
     }
+
+    // Helpers to create empty plans
+    private BasicPlan createEmptyBasicPlan() {
+        BasicPlan empty = new BasicPlan();
+        empty.setHeadline("No workout");
+        empty.setSubtitle("");
+        empty.setWorkouts(Collections.emptyList());
+        return empty;
+    }
+
+    private MealPlan createEmptyMealPlan() {
+        MealPlan empty = new MealPlan();
+        empty.setHeadline("No meal plan");
+        empty.setSubtitle("");
+        empty.setDiets(Collections.emptyList());
+        return empty;
+    }
+
 
     @Override
     public NutritionPlanResponse generateNutritionPlan(NutritionPlanRequest form) {
