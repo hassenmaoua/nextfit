@@ -13,6 +13,7 @@ import org.nextfit.backend.model.support.WorkoutEntry;
 @Getter
 @Setter
 public final class BasicPlan extends InfoSection implements PlanType {
+    @JsonProperty(value = "type", required = true, defaultValue = "BASIC")
     private PlanLevel type = PlanLevel.BASIC;
 
     @JsonProperty(value = "workouts", required = true)

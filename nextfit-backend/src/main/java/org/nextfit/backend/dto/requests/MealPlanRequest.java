@@ -27,7 +27,7 @@ public class MealPlanRequest implements PlanRequest {
     private int calorieTarget;
 
     @Schema(description = "Goal weight in kg (optional)")
-    private Double goalWeight;
+    private Double targetWeight;
 
     @Schema(description = "Current activity level, e.g., sedentary, active")
     private String currentActivity;
@@ -50,24 +50,6 @@ public class MealPlanRequest implements PlanRequest {
     @Schema(description = "Comma-separated food allergies (optional)")
     private String foodAllergies;
 
-    @Schema(description = "Comma-separated disliked foods (optional)")
-    private String dislikedFoods;
-
     @Schema(description = "Comma-separated preferred foods (optional)")
     private String preferredFoods;
-
-    @Schema(description = "Comma-separated excluded categories (optional)")
-    private String excludedCategories;
-
-    @Schema(description = "Preferred breakfast time (optional, e.g., 08:00)")
-    private String breakfastTime;
-
-    @Schema(description = "Preferred lunch time (optional, e.g., 13:00)")
-    private String lunchTime;
-
-    @Schema(description = "Preferred dinner time (optional, e.g., 19:00)")
-    private String dinnerTime;
-
-    @Schema(description = "Whether snacks are preferred (optional)")
-    private Boolean snackPreference;
 }
