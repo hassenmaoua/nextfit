@@ -11,7 +11,7 @@ export enum LoadingType {
     providedIn: 'root'
 })
 export class LoadingService {
-    private isLoading$ = new BehaviorSubject<boolean>(false);
+    private readonly isLoading$ = new BehaviorSubject<boolean>(false);
 
     getLoadingStatus(): Observable<boolean> {
         return this.isLoading$.asObservable();

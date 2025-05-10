@@ -1,7 +1,6 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { LoadingService, LoadingType } from '../services/loading.service';
-import { interval, map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ProgressBar } from 'primeng/progressbar';
 import { FormService } from '../../services/form.service';
 
@@ -100,7 +99,7 @@ export class Progress {
     isVisible$: Observable<boolean>;
     currentPhrase$: Observable<string>;
 
-    constructor(private formService: FormService) {
+    constructor(private readonly formService: FormService) {
         this.isVisible$ = this.formService.getLoadingStatus();
         this.currentPhrase$ = this.formService.getCurrentPhrase();
     }

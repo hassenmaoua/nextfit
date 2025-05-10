@@ -91,16 +91,14 @@ export class AppMenuitem {
 
     constructor(
         public router: Router,
-        private layoutService: LayoutService
+        private readonly layoutService: LayoutService
     ) {
         this.menuSourceSubscription = this.layoutService.menuSource$.subscribe((value) => {
             Promise.resolve(null).then(() => {
                 if (value.routeEvent) {
-                    this.active = value.key === this.key || value.key.startsWith(this.key + '-') ? true : false;
-                } else {
-                    if (value.key !== this.key && !value.key.startsWith(this.key + '-')) {
-                        this.active = false;
-                    }
+                    this.active = !!(value.key === this.key || value.key.startsWith(this.key + '-'));
+                } else if (value.key !== this.key && !value.key.startsWith(this.key + '-')) {
+                    this.active = false;
                 }
             });
         });
@@ -153,7 +151,10 @@ export class AppMenuitem {
     }
 
     get submenuAnimation() {
-        return this.root ? 'expanded' : this.active ? 'expanded' : 'collapsed';
+        if (this.root || this.active) {
+            return 'expanded';
+        }
+        return 'collapsed';
     }
 
     @HostBinding('class.active-menuitem')

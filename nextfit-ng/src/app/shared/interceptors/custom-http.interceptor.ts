@@ -1,7 +1,5 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { environment } from '../../../environment/environment';
 import { inject } from '@angular/core';
-import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from '../../auth/services/auth.service';
 
 export const customHttpInterceptor: HttpInterceptorFn = (req, next) => {

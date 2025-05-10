@@ -28,10 +28,10 @@
             <p-table [value]="[1, 2, 3, 4, 5]">
                 <ng-template pTemplate="header">
                     <tr>
-                        <th><p-skeleton width="80%"></p-skeleton></th>
-                        <th><p-skeleton width="70%"></p-skeleton></th>
-                        <th><p-skeleton width="60%"></p-skeleton></th>
-                        <th><p-skeleton width="50%"></p-skeleton></th>
+                        <th scope="col"><p-skeleton width="80%"></p-skeleton></th>
+                        <th scope="col"><p-skeleton width="70%"></p-skeleton></th>
+                        <th scope="col"><p-skeleton width="60%"></p-skeleton></th>
+                        <th scope="col"><p-skeleton width="50%"></p-skeleton></th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-row>
@@ -137,10 +137,10 @@
         <p-table [value]="week.workouts" scrollHeight="40rem" class="min-w-[600px] w-full text-slate-800 dark:text-white" rowGroupMode="subheader" groupRowsBy="day" [customSort]="true" [tableStyle]="{ 'min-width': '30rem' }">
             <ng-template #header>
                 <tr class="text-slate-800 dark:text-white">
-                    <th style="width: 2rem"><p-tableHeaderCheckbox /></th>
-                    <th>Focus</th>
-                    <th>Exercise</th>
-                    <th>Description</th>
+                    <th scope="col" style="width: 2rem"><p-tableHeaderCheckbox /></th>
+                    <th scope="col">Focus</th>
+                    <th scope="col">Exercise</th>
+                    <th scope="col">Description</th>
                 </tr>
             </ng-template>
             <ng-template #groupheader let-workout>

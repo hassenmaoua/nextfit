@@ -1,4 +1,4 @@
-import { layoutConfig } from '../../layout/service/layout.service';
+import { LayoutConfig } from '../../layout/service/layout.service';
 
 export interface UserDTO {
     id: string;
@@ -17,10 +17,5 @@ export interface UserDTO {
     enabled: boolean;
     accountLocked: boolean;
     registrationComplete: boolean;
-    config: layoutConfig;
-}
-
-export interface loginRequest {
-    email: string;
-    password: string;
+    config: LayoutConfig;
 }

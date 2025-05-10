@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 import { AuthModel } from '../models/auth.model';
 import { environment } from '../../../environment/environment';
 import { UserDTO } from '../models/user.model';
-import { layoutConfig } from '../../layout/service/layout.service';
+import { LayoutConfig } from '../../layout/service/layout.service';
 
 const API_AUTH_URL = `${environment.apiUrl}/auth`;
 const API_PASSWORD_URL = `${environment.apiUrl}/password-reset`;
@@ -14,7 +14,7 @@ const API_PASSWORD_URL = `${environment.apiUrl}/password-reset`;
     providedIn: 'root'
 })
 export class AuthHTTPService {
-    constructor(private http: HttpClient) {}
+    constructor(private readonly http: HttpClient) {}
 
     // public methods
     login(email: string, password: string): Observable<any> {
@@ -44,13 +44,10 @@ export class AuthHTTPService {
     }
 
     getUserByToken(token: string): Observable<UserDTO> {
-        const httpHeaders = new HttpHeaders({
-            Authorization: `Bearer ${token}`
-        });
         return this.http.post<UserDTO>(`${API_AUTH_URL}/verify_token?token=${token}`, null);
     }
 
-    updateLayout(_config: layoutConfig): Observable<any> {
+    updateLayout(_config: LayoutConfig): Observable<any> {
         return this.http.put(`${environment.apiUrl}/layout-config`, _config);
     }
 }

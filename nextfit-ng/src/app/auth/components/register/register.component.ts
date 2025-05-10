@@ -27,23 +27,21 @@ export class RegisterComponent implements OnInit, OnDestroy {
     isLoading$: Observable<boolean>;
     visible = false;
 
-    private destroy$ = new Subject<void>();
+    private readonly destroy$ = new Subject<void>();
 
     constructor(
-        private authService: AuthService,
-        private router: Router,
-        private loadingService: LoadingService
+        private readonly authService: AuthService,
+        private readonly router: Router,
+        private readonly loadingService: LoadingService
     ) {
         this.isLoading$ = this.authService.isLoading$;
     }
 
     ngOnInit(): void {
-        console.log('RegisterComponent initialized');
         this.initForm();
     }
 
     ngOnDestroy(): void {
-        console.log('RegisterComponent destroyed');
         this.destroy$.next();
         this.destroy$.complete();
     }

@@ -13,5 +13,13 @@ export default {
             xl: '1200px',
             '2xl': '1920px'
         }
-    }
+    },
+    safelist: [
+    // Grid columns
+    ...Array.from({ length: 12 }, (_, i) => `md:grid-cols-${i + 1}`),
+    // Column spans
+    ...Array.from({ length: 12 }, (_, i) => `md:col-span-${i + 1}`),
+    // Full span
+    'md:col-span-full'
+  ],
 };

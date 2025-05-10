@@ -3,7 +3,7 @@ import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DatePickerModule } from 'primeng/datepicker';
 import { FieldComponent } from '../../../shared/components/field/field.component';
 import { Observable, Subscription } from 'rxjs';
@@ -20,7 +20,7 @@ import { UserDTO } from '../../models/user.model';
     templateUrl: 'registration-complete.component.html'
 })
 export class RegistrationCompleteComponent implements OnInit, OnDestroy {
-    private unsubscribe: Subscription[] = [];
+    private readonly unsubscribe: Subscription[] = [];
 
     fields: FieldConfig[] = profileConfig;
     formGoup!: FormGroup;
@@ -32,10 +32,9 @@ export class RegistrationCompleteComponent implements OnInit, OnDestroy {
     ];
 
     constructor(
-        private router: Router,
-        private authService: AuthService,
-        private fb: FormBuilder,
-        private fieldService: FieldService
+        private readonly router: Router,
+        private readonly authService: AuthService,
+        private readonly fieldService: FieldService
     ) {
         this.isLoading$ = authService.isLoading$;
     }

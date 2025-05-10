@@ -6,9 +6,9 @@ import { AuthService } from './auth.service';
     providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-    private router = inject(Router);
+    private readonly router = inject(Router);
 
-    constructor(private authService: AuthService) {}
+    constructor(private readonly authService: AuthService) {}
 
     async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
         // First check if we have a cached currentUser

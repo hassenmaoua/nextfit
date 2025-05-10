@@ -31,10 +31,10 @@ export class ForgotPasswordComponent {
     submitted: boolean = false;
 
     // private fields
-    private unsubscribe: Subscription[] = [];
+    private readonly unsubscribe: Subscription[] = [];
     constructor(
-        private fb: FormBuilder,
-        private authService: AuthService
+        private readonly fb: FormBuilder,
+        private readonly authService: AuthService
     ) {
         this.isLoadingSubject = new BehaviorSubject<boolean>(false);
         this.isLoading$ = this.isLoadingSubject.asObservable();
@@ -58,18 +58,18 @@ export class ForgotPasswordComponent {
     submitReset() {
         this.isLoadingSubject.next(true);
         this.submitState = SubmitStates.NotSubmitted;
-        const forgotPasswordSubscr = this.authService.forgotPassword(this.f['email'].value).subscribe(
-            (response: any) => {
+        const forgotPasswordSubscr = this.authService.forgotPassword(this.f['email'].value).subscribe({
+            next: (response: any) => {
                 console.log('Password reset request successful:', response);
                 this.submitState = SubmitStates.NoError;
                 this.isLoadingSubject.next(false);
             },
-            (error: any) => {
+            error: (error: any) => {
                 console.error('Password reset request failed:', error);
                 this.submitState = SubmitStates.HasError;
                 this.isLoadingSubject.next(false);
             }
-        );
+        });
 
         this.unsubscribe.push(forgotPasswordSubscr);
     }

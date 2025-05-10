@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, HostBinding, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Menu, MenuModule } from 'primeng/menu';
 import { BadgeModule } from 'primeng/badge';
@@ -12,7 +12,7 @@ import { PasswordModule } from 'primeng/password';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { ButtonModule } from 'primeng/button';
 import { FieldComponent } from '../../shared/components/field/field.component';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { FieldConfig } from '../../models/form-builder/form-config.model';
 import { profileConfig } from '../../core/profile-form.config';
@@ -100,7 +100,7 @@ import { PopoverModule } from 'primeng/popover';
 })
 export class AppProfile implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('menu') menu!: Menu;
-    private unsubscribe: Subscription[] = [];
+    private readonly unsubscribe: Subscription[] = [];
 
     fields: FieldConfig[] = profileConfig;
 
@@ -122,10 +122,10 @@ export class AppProfile implements OnInit, AfterViewInit, OnDestroy {
     ];
 
     constructor(
-        private renderer: Renderer2,
-        private authService: AuthService,
-        private fieldService: FieldService,
-        private userService: UserService
+        private readonly renderer: Renderer2,
+        private readonly authService: AuthService,
+        private readonly fieldService: FieldService,
+        private readonly userService: UserService
     ) {
         this.isLoadingSubject = new BehaviorSubject<boolean>(false);
         this.isLoading$ = this.isLoadingSubject.asObservable();

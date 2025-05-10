@@ -1,11 +1,11 @@
 import { Injectable, effect, signal, computed } from '@angular/core';
 import { Subject } from 'rxjs';
 import { AuthService } from '../../auth/services/auth.service';
-export interface layoutConfig {
+export interface LayoutConfig {
     id?: string;
     preset?: string;
     primary?: string;
-    surface?: string | undefined | null;
+    surface?: string | null;
     darkTheme?: boolean;
     menuMode?: string;
 }
@@ -27,7 +27,7 @@ interface MenuChangeEvent {
     providedIn: 'root'
 })
 export class LayoutService {
-    _config: layoutConfig = {
+    _config: LayoutConfig = {
         preset: 'Aura',
         primary: 'rose',
         surface: null,
@@ -43,17 +43,17 @@ export class LayoutService {
         menuHoverActive: false
     };
 
-    layoutConfig = signal<layoutConfig>(this._config);
+    layoutConfig = signal<LayoutConfig>(this._config);
 
     layoutState = signal<LayoutState>(this._state);
 
-    private configUpdate = new Subject<layoutConfig>();
+    private readonly configUpdate = new Subject<LayoutConfig>();
 
-    private overlayOpen = new Subject<any>();
+    private readonly overlayOpen = new Subject<any>();
 
-    private menuSource = new Subject<MenuChangeEvent>();
+    private readonly menuSource = new Subject<MenuChangeEvent>();
 
-    private resetSource = new Subject();
+    private readonly resetSource = new Subject();
 
     menuSource$ = this.menuSource.asObservable();
 
@@ -83,7 +83,7 @@ export class LayoutService {
         const item = localStorage.getItem('config') as string;
 
         if (item) {
-            const config = JSON.parse(item) as layoutConfig;
+            const config = JSON.parse(item) as LayoutConfig;
             if (config) {
                 this.layoutConfig.update((state) => ({ ...config }));
             }
@@ -114,7 +114,7 @@ export class LayoutService {
         });
     }
 
-    private handleDarkModeTransition(config: layoutConfig): void {
+    private handleDarkModeTransition(config: LayoutConfig): void {
         if ((document as any).startViewTransition) {
             this.startViewTransition(config);
         } else {
@@ -123,7 +123,7 @@ export class LayoutService {
         }
     }
 
-    private startViewTransition(config: layoutConfig): void {
+    private startViewTransition(config: LayoutConfig): void {
         const transition = (document as any).startViewTransition(() => {
             this.toggleDarkMode(config);
         });
@@ -135,7 +135,7 @@ export class LayoutService {
             .catch(() => {});
     }
 
-    toggleDarkMode(config?: layoutConfig): void {
+    toggleDarkMode(config?: LayoutConfig): void {
         const _config = config || this.layoutConfig();
         if (_config.darkTheme) {
             document.documentElement.classList.add('app-dark');

@@ -10,7 +10,7 @@ import { UserDTO } from '../auth/models/user.model';
 export class UserService {
     private readonly USER_URL = `${environment.apiUrl}/user`;
 
-    constructor(private http: HttpClient) {}
+    constructor(private readonly http: HttpClient) {}
 
     updateProfile(body: UpdateProfileRequest) {
         return this.http.post<UserDTO>(`${this.USER_URL}/update-profile`, body);

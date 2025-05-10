@@ -5,7 +5,7 @@
 
 <p-fluid *ngIf="config">
     <div *ngIf="!loading; else loadingTemplate">
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col">
             <ng-container *ngFor="let section of config; let i = index">
                 <p-panel class="shadow-xl rounded-xl overflow-hidden">
                     <ng-template #header>
@@ -15,13 +15,11 @@
                         </div>
                     </ng-template>
                     <div class="grid gap-6 p-5" [class]="section.size ? 'md:grid-cols-' + section.size : 'md:grid-cols-2'">
-                        <ng-container *ngFor="let field of section.fields">
-                            <div [class]="field.width ? 'md:col-span-' + field.width : ''">
-                                <ng-container *ngIf="isFieldVisible(field)">
-                                    <app-field [formGroup]="form" [controlName]="field.fieldName" [config]="field"></app-field>
-                                </ng-container>
-                            </div>
-                        </ng-container>
+                        <div *ngFor="let field of section.fields" [class]="field.width ? 'md:col-span-' + field.width : ''">
+                            <ng-container *ngIf="isFieldVisible(field)">
+                                <app-field [formGroup]="form" [controlName]="field.fieldName" [config]="field"></app-field>
+                            </ng-container>
+                        </div>
                     </div>
                 </p-panel>
 

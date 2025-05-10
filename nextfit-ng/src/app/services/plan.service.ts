@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environment/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DualPlan, Plan, PlanLevel, PlanType } from '../models/plan';
+import { Plan, PlanLevel, PlanType } from '../models/plan';
 import { PlanDTO } from '../models/dto';
 import { BasicPlanRequest, MealPlanRequest, NutritionPlanRequest, PlanRequest, PremiumPlanRequest } from '../models/requests';
 
@@ -12,7 +12,7 @@ import { BasicPlanRequest, MealPlanRequest, NutritionPlanRequest, PlanRequest, P
 export class PlanService {
     private readonly apiUrl = `${environment.apiUrl}/plans`;
 
-    constructor(private http: HttpClient) {}
+    constructor(private readonly http: HttpClient) {}
 
     generatePlan(request: PlanRequest): Observable<PlanDTO> {
         return this.http.post<PlanDTO>(`${this.apiUrl}/generate`, request);

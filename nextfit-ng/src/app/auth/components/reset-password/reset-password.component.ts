@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AbstractControlOptions, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { Message } from 'primeng/message';
@@ -16,12 +16,18 @@ enum SubmitStates {
     NoError
 }
 
+interface ChangePasswordForm {
+    token: FormControl<string>;
+    password: FormControl<string>;
+    cPassword: FormControl<string>;
+}
+
 @Component({
     selector: 'app-reset-password',
     imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, ButtonModule, PasswordModule, FloatLabelModule, Message],
     templateUrl: './reset-password.component.html'
 })
-export class ResetPasswordComponent {
+export class ResetPasswordComponent implements OnInit, OnDestroy {
     changePasswordForm!: FormGroup;
 
     submitState: SubmitStates = SubmitStates.NotSubmitted;
@@ -34,11 +40,12 @@ export class ResetPasswordComponent {
     token!: string;
 
     // private fields
-    private unsubscribe: Subscription[] = [];
+    private readonly unsubscribe: Subscription[] = [];
+
     constructor(
-        private fb: FormBuilder,
-        private authService: AuthService,
-        private route: ActivatedRoute
+        private readonly fb: FormBuilder,
+        private readonly authService: AuthService,
+        private readonly route: ActivatedRoute
     ) {
         const queryParamSubscr = this.route.queryParams.subscribe((params) => {
             this.token = params['token'];
@@ -52,21 +59,29 @@ export class ResetPasswordComponent {
         this.initForm();
     }
 
+    ngOnDestroy(): void {
+        // Unsubscribe from all subscriptions
+        this.unsubscribe.forEach((sub) => sub.unsubscribe());
+
+        // Complete the BehaviorSubject
+        this.isLoadingSubject.complete();
+    }
+
     // convenience getter for easy access to form fields
     get f() {
         return this.changePasswordForm.controls;
     }
 
     initForm() {
-        this.changePasswordForm = this.fb.group(
+        this.changePasswordForm = this.fb.group<ChangePasswordForm>(
             {
-                token: [this.token, Validators.compose([Validators.required])],
-                password: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
-                cPassword: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])]
+                token: this.fb.nonNullable.control(this.token, Validators.required),
+                password: this.fb.nonNullable.control('', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]),
+                cPassword: this.fb.nonNullable.control('', [Validators.required, Validators.minLength(3), Validators.maxLength(100)])
             },
             {
-                validator: ConfirmPasswordValidator.MatchPassword
-            }
+                validators: ConfirmPasswordValidator.MatchPassword
+            } as AbstractControlOptions
         );
     }
 
@@ -74,18 +89,18 @@ export class ResetPasswordComponent {
         this.isLoadingSubject.next(true);
         const password = this.f['password'].value;
         this.submitState = SubmitStates.NotSubmitted;
-        const changePasswordSubscr = this.authService.changePassword(this.token, password).subscribe(
-            (response: any) => {
+        const changePasswordSubscr = this.authService.changePassword(this.token, password).subscribe({
+            next: (response: any) => {
                 console.log('Password change request successful:', response);
                 this.submitState = SubmitStates.NoError;
                 this.isLoadingSubject.next(false);
             },
-            (error: any) => {
+            error: (error: any) => {
                 console.error('Password change request failed:', error);
                 this.submitState = SubmitStates.HasError;
                 this.isLoadingSubject.next(false);
             }
-        );
+        });
         this.unsubscribe.push(changePasswordSubscr);
     }
 

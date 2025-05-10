@@ -101,13 +101,15 @@ export class AppTopbar implements OnInit, AfterViewInit {
 
     constructor(
         public layoutService: LayoutService,
-        private authService: AuthService
+        private readonly authService: AuthService
     ) {}
 
-    ngOnInit() {}
+    ngOnInit() {
+        /* TODO document why this method 'ngOnInit' is empty */
+    }
 
     ngAfterViewInit(): void {
-        this.name = this.authService.currentUser?.firstName || '';
+        this.name = this.authService.currentUser?.firstName ?? '';
     }
 
     toggleDarkMode() {
