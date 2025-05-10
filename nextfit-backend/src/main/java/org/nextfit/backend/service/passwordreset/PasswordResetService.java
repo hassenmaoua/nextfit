@@ -29,7 +29,7 @@ public class PasswordResetService implements IPasswordResetService {
     private final PasswordEncoder passwordEncoder;
 
     @Value("${application.mailing.reset-password-url}")
-    private String RESET_PASSWORD_URL;
+    private String resetUrl;
 
 
     @Override
@@ -47,7 +47,7 @@ public class PasswordResetService implements IPasswordResetService {
         LocalDateTime tokenExpiresAt;
         LocalDateTime now = LocalDateTime.now();
 
-        Token savedToken = tokenRepository.findByToken(token)
+        Token savedToken = tokenRepository.findByValue(token)
                 .orElseThrow(() -> new InvalidTokenException("Invalid token"));
 
         if (!savedToken.getType().equals(TokenType.RESET_PASSWORD)) {
@@ -82,7 +82,7 @@ public class PasswordResetService implements IPasswordResetService {
                 user.getEmail(),
                 "",
                 EmailTemplateName.RESET_PASSWORD,
-                RESET_PASSWORD_URL + "?token=" + newToken,
+                resetUrl + "?token=" + newToken,
                 newToken,
                 "Reset Password"
         );
@@ -91,7 +91,7 @@ public class PasswordResetService implements IPasswordResetService {
     private String generateAndSaveResetToken(User user) {
         String generatedToken = Utils.generateTokenCode(20, TokenType.RESET_PASSWORD);
         var token = Token.builder()
-                .token(generatedToken)
+                .value(generatedToken)
                 .type(TokenType.RESET_PASSWORD)
                 .createdAt(LocalDateTime.now())
                 .expiresAt(LocalDateTime.now().plusMinutes(15))

@@ -6,6 +6,7 @@ import org.nextfit.backend.dto.responses.*;
 import org.nextfit.backend.dto.*;
 import org.nextfit.backend.entity.PlanEntity;
 import org.nextfit.backend.model.Plan;
+import org.nextfit.backend.model.PlanType;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface IPlanService {
 
     PlanEntity createPlan(Plan<?> plan, PlanRequest request);
 
-    Plan<?> getPlanById(Long id) throws JsonProcessingException;
+    Plan<PlanType> getPlanById(Long id) throws JsonProcessingException;
 
     List<PlanDTO> getAllPlansByUserId(Long userId);
 

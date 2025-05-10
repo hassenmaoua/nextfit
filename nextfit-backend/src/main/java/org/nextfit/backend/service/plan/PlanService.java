@@ -8,10 +8,7 @@ import org.nextfit.backend.dto.*;
 import org.nextfit.backend.enumeration.PlanLevel;
 import org.nextfit.backend.exception.InvalidInputException;
 import org.nextfit.backend.exception.PlanGenerationException;
-import org.nextfit.backend.model.BasicPlan;
-import org.nextfit.backend.model.DualPlan;
-import org.nextfit.backend.model.MealPlan;
-import org.nextfit.backend.model.Plan;
+import org.nextfit.backend.model.*;
 import org.nextfit.backend.security.AccessService;
 import org.nextfit.backend.utils.JsonUtils;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -71,7 +68,7 @@ public class PlanService implements IPlanService {
     }
 
     @Transactional(readOnly = true)
-    public Plan<?> getPlanById(Long id) {
+    public Plan<PlanType> getPlanById(Long id) {
         PlanEntity plan = planRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Plan not found with id: " + id));
         return JsonUtils.toPlan(plan.getContent());

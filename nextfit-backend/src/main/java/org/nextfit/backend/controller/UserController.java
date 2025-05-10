@@ -24,7 +24,7 @@ public class UserController {
     private final AccessService accessService;
 
     @PostMapping("/update-profile")
-    public ResponseEntity<?> updateProfile(@Valid @RequestBody UpdateUserRequest request) {
+    public ResponseEntity<UserDTO> updateProfile(@Valid @RequestBody UpdateUserRequest request) {
         User authenticatedUser = accessService.getCurrentUser();
 
         User user = userService.updateUserProfile(authenticatedUser.getId(), request);
@@ -67,7 +67,7 @@ public class UserController {
             summary = "Disable Account",
             description = "User self disable account.")
     @DeleteMapping("/disable")
-    public ResponseEntity<?> disableAccount() {
+    public ResponseEntity<Void> disableAccount() {
         var user = accessService.getCurrentUser();
 
         userService.disableAccount(user);

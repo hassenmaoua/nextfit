@@ -10,13 +10,15 @@ import lombok.NoArgsConstructor;
 import org.nextfit.backend.enumeration.Language;
 import org.nextfit.backend.enumeration.LayoutPrimary;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @Entity
 @Table(name = "layout_config")
 @AllArgsConstructor
 @NoArgsConstructor
-public class LayoutConfig {
+public class LayoutConfig implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,6 +1,7 @@
 package org.nextfit.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.extern.slf4j.Slf4j;
 import org.nextfit.backend.enumeration.PlanLevel;
 import org.nextfit.backend.model.support.InfoSection;
 
@@ -12,6 +13,7 @@ import org.nextfit.backend.model.support.WorkoutEntry;
 
 @Getter
 @Setter
+@Slf4j
 public final class BasicPlan extends InfoSection implements PlanType {
     @JsonProperty(value = "type", required = true, defaultValue = "BASIC")
     private PlanLevel type = PlanLevel.BASIC;
@@ -21,7 +23,7 @@ public final class BasicPlan extends InfoSection implements PlanType {
 
     @Override
     public void displayPlan() {
-        System.out.println("Basic Workouts: " + workouts);
+        log.info("Basic Workouts: {}", workouts);
     }
 
-   }
+}

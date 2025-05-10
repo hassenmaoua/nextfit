@@ -31,7 +31,7 @@ public class PasswordResetController {
             summary = "Change password",
             description = "Send a new password to change.")
     @PostMapping("/change")
-    public ResponseEntity<?> changePassword(@RequestBody ResetPasswordRequest request) throws MessagingException {
+    public ResponseEntity<Void> changePassword(@RequestBody ResetPasswordRequest request) throws MessagingException {
         passwordResetService.updatePassword(request.password, request.token);
         return ResponseEntity.accepted().build();
     }

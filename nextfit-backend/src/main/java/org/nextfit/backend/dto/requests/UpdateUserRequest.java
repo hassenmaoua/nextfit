@@ -27,7 +27,7 @@ public class UpdateUserRequest {
     private LocalDate birthDate;
 
     @Schema(description = "Phone  number of the user", example = "55000000")
-    @Pattern(regexp = "^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$")
+    @Pattern(regexp = "^\\+?\\(?\\d{1,4}\\)?[-\\s./\\d]*$")
     private String phone;
 
     @Schema(description = "Current physical activity of the user", example = "1-2x/week")

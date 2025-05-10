@@ -19,7 +19,7 @@ public class Token {
     @Enumerated(EnumType.STRING)
     private TokenType type;
     @Column(unique = true)
-    private String token;
+    private String value;
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
     private LocalDateTime validatedAt;

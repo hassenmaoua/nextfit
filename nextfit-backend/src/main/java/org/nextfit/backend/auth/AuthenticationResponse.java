@@ -3,7 +3,6 @@ package org.nextfit.backend.auth;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.nextfit.backend.enumeration.UserRole;
 
 @Getter
 @Setter

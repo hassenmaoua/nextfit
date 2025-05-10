@@ -6,6 +6,9 @@ import org.nextfit.backend.entity.User;
 import java.security.SecureRandom;
 
 public class Utils {
+
+    private Utils() {}
+
     public static String capitalizeWords(String input) {
         // Check if input string is null
         if (input == null) {
@@ -30,8 +33,7 @@ public class Utils {
         return result.toString().trim();
     }
 
-
-    private static boolean isNotEmpty(String value) {
+    public static boolean isNotEmpty(String value) {
         return value != null && !value.trim().isEmpty();
     }
 
