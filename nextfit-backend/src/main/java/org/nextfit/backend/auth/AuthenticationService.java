@@ -44,21 +44,16 @@ public class AuthenticationService {
     private String activationUrl;
 
     @Value("${application.default-active}")
-    private static boolean ACTIVE;
+    private boolean active;
 
     public User register(RegistrationRequest request) throws MessagingException {
-//        var userRole = roleRepository.findByName("USER")
-//                .orElseThrow(() -> new IllegalStateException("ROLE USER was not initiated"));
-
-
         var user = UserMapper.mapRegistrationRequestToUser(request);
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-//        user.setRoles(Collections.singletonList(userRole));
         user.setFirstName("TEMP");
         user.setFullName("TEMP");
         user.setGender(UserGender.MALE);
-        user.setEnabled(ACTIVE);
+        user.setEnabled(active);
 
         user = userRepository.save(user);
 
@@ -82,8 +77,6 @@ public class AuthenticationService {
         var authToken = jwtService.generateToken(claims, user);
         var refreshToken = jwtService.generateRefreshToken(user);
 
-//        var authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-//        UserRole role = authorities.contains("ADMIN") ? UserRole.ADMIN : UserRole.USER;
 
         return AuthenticationResponse.builder()
                 .authToken(authToken)
@@ -96,7 +89,7 @@ public class AuthenticationService {
         LocalDateTime tokenExpiresAt;
         LocalDateTime now = LocalDateTime.now();
 
-        Token savedToken = tokenRepository.findByToken(token)
+        Token savedToken = tokenRepository.findByValue(token)
                 .orElseThrow(() -> new InvalidTokenException("Invalid token"));
 
         if (!savedToken.getType().equals(TokenType.ACTIVATE_ACCOUNT)) {
@@ -141,7 +134,7 @@ public class AuthenticationService {
         // Generate a token
         String generatedToken = Utils.generateTokenCode(6, TokenType.ACTIVATE_ACCOUNT);
         var token = Token.builder()
-                .token(generatedToken)
+                .value(generatedToken)
                 .type(TokenType.ACTIVATE_ACCOUNT)
                 .createdAt(LocalDateTime.now())
                 .expiresAt(LocalDateTime.now().plusMinutes(30))

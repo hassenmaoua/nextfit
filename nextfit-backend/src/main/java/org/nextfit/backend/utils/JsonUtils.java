@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.nextfit.backend.dto.requests.BasicPlanRequest;
 import org.nextfit.backend.dto.requests.PlanRequest;
 import org.nextfit.backend.model.Plan;
+import org.nextfit.backend.model.PlanType;
 
 public class JsonUtils {
 
@@ -20,7 +21,7 @@ public class JsonUtils {
     }
 
     // Convert JSON to GeneratedPlan
-    public static Plan<?> toPlan(String json) {
+    public static Plan<PlanType> toPlan(String json) {
         try {
             return objectMapper.readValue(json, Plan.class);
         } catch (JsonProcessingException e) {

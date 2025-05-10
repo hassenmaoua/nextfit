@@ -9,6 +9,7 @@ import org.nextfit.backend.dto.*;
 import org.nextfit.backend.dto.requests.*;
 import org.nextfit.backend.entity.PlanEntity;
 import org.nextfit.backend.model.Plan;
+import org.nextfit.backend.model.PlanType;
 import org.nextfit.backend.security.AccessService;
 import org.nextfit.backend.service.plan.PlanService;
 import org.nextfit.backend.utils.mapper.PlanMapper;
@@ -65,7 +66,7 @@ public class PlanController {
     }
 
     @GetMapping("/{planId}")
-    public ResponseEntity<Plan<?>> getPlanById(@PathVariable Long planId) {
+    public ResponseEntity<Plan<PlanType>> getPlanById(@PathVariable Long planId) {
         var plan = planService.getPlanById(planId);
         return ResponseEntity.ok(plan);
     }

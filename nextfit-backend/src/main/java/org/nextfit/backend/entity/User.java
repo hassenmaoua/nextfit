@@ -88,12 +88,7 @@ public class User implements UserDetails, Principal {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new GrantedAuthority() {
-            @Override
-            public String getAuthority() {
-                return "USER_ROLE";
-            }
-        });
+        return List.of((GrantedAuthority) () -> "USER_ROLE");
     }
 
     @Override

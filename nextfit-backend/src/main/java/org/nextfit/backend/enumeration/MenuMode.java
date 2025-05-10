@@ -1,5 +1,8 @@
 package org.nextfit.backend.enumeration;
 
+import lombok.Getter;
+
+@Getter
 public enum MenuMode {
     STATIC("static"),
     OVERLAY("overlay");
@@ -8,10 +11,6 @@ public enum MenuMode {
 
     MenuMode(String label) {
         this.label = label;
-    }
-
-    public String getLabel() {
-        return label;
     }
 
     public static MenuMode fromLabel(String label) {

@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.nextfit.backend.dto.UserDTO;
 import org.nextfit.backend.entity.User;
 import org.nextfit.backend.handler.ExceptionResponse;
@@ -28,7 +27,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<?> register(@RequestBody @Valid RegistrationRequest request) throws MessagingException, BadRequestException {
+    public ResponseEntity<Object> register(@RequestBody @Valid RegistrationRequest request) throws MessagingException {
         if (userService.userExists(request.getEmail())) {
             var res = ExceptionResponse.builder()
                     .businessErrorCode(BAD_CREDENTIALS.getCode())
@@ -51,7 +50,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.authenticate(request));
     }
     @GetMapping("/activate-account")
-    public ResponseEntity<?> confirm(
+    public ResponseEntity<Void> confirm(
             @RequestParam String token
     ) throws MessagingException {
         service.activateAccount(token);
