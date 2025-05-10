@@ -33,7 +33,7 @@ export class AppMenu {
     error: string | null = null;
     skeletons: any[] = [220, 180, 160, 190, 170, 150, 140];
 
-    constructor(private menuSerivce: MenuService) {}
+    constructor(private readonly menuSerivce: MenuService) {}
 
     ngOnInit() {
         this.model = [

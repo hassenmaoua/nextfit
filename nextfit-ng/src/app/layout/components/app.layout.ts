@@ -44,13 +44,11 @@ export class AppLayout {
         public router: Router
     ) {
         this.overlayMenuOpenSubscription = this.layoutService.overlayOpen$.subscribe(() => {
-            if (!this.menuOutsideClickListener) {
-                this.menuOutsideClickListener = this.renderer.listen('document', 'click', (event) => {
-                    if (this.isOutsideClicked(event)) {
-                        this.hideMenu();
-                    }
-                });
-            }
+            this.menuOutsideClickListener ??= this.renderer.listen('document', 'click', (event) => {
+                if (this.isOutsideClicked(event)) {
+                    this.hideMenu();
+                }
+            });
 
             if (this.layoutService.layoutState().staticMenuMobileActive) {
                 this.blockBodyScroll();

@@ -29,32 +29,31 @@ export class LoginComponent implements OnInit, OnDestroy {
     returnUrl!: string;
     isLoading$: Observable<boolean>;
 
-    private destroy$ = new Subject<void>();
+    private readonly destroy$ = new Subject<void>();
 
     constructor(
-        private authService: AuthService,
-        private route: ActivatedRoute,
-        private router: Router,
-        private loadingService: LoadingService
+        private readonly authService: AuthService,
+        private readonly route: ActivatedRoute,
+        private readonly router: Router,
+        private readonly loadingService: LoadingService
     ) {
         this.isLoading$ = this.authService.isLoading$;
-        // redirect to home if already logged in
-        if (this.authService.currentUser) {
-            this.router.navigate(['/home']);
-        }
     }
 
     ngOnInit(): void {
-        console.log('LoginComponent initialized');
+        // redirect to home if already logged in
+        if (this.authService.currentUser) {
+            this.router.navigate(['/home']);
+            return;
+        }
         this.initForm();
         // get return url from route parameters or default to '/'
-        this.returnUrl = this.route.snapshot.queryParams['returnUrl'.toString()] || '/home';
+        this.returnUrl = this.route.snapshot.queryParams['returnUrl'.toString()] ?? '/home';
     }
 
     ngOnDestroy() {
-        console.log('LoginComponent destroyed');
-        // this.destroy$.next();
-        // this.destroy$.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     // convenience getter for easy access to form fields
@@ -63,7 +62,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     initForm(): void {
-        const lastEmail = localStorage.getItem('lastUsedEmail') || '';
+        const lastEmail = localStorage.getItem('lastUsedEmail') ?? '';
         this.loginForm = new FormGroup({
             email: new FormControl(this.defaultAuth.email, [Validators.required]), // Validators.email,
             password: new FormControl(this.defaultAuth.password, [Validators.required, Validators.minLength(3)]),
@@ -95,7 +94,7 @@ export class LoginComponent implements OnInit, OnDestroy {
                     }
                 },
                 error: (err) => {
-                    const message = err?.error?.message || 'Login failed. Please try again later.';
+                    const message = err?.error?.message ?? 'Login failed. Please try again later.';
                     console.error('Login error:', err);
                     this.authService.showError(message);
                 },

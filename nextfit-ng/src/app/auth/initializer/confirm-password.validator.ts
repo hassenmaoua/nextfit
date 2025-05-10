@@ -14,7 +14,7 @@ export class ConfirmPasswordValidator {
         }
     }
 
-    static MatchNewPassword: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    static readonly MatchNewPassword: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
         const password = control.get('newPassword')?.value;
         const confirmPassword = control.get('cPassword')?.value;
 

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MenuItem, MessageService, TreeNode } from 'primeng/api';
 import { TreeModule } from 'primeng/tree';
@@ -6,12 +6,10 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
-import { Menu } from 'primeng/menu';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Skeleton } from 'primeng/skeleton';
 import { PanelModule } from 'primeng/panel';
-import { Tooltip } from 'primeng/tooltip';
 import { ToastModule } from 'primeng/toast';
 import { BasicPlan, DualPlan, MealPlan, NutritionPlan, Plan, PlanLevel, PremiumPlan } from '../../models/plan';
 import { PlanService } from '../../services/plan.service';
@@ -101,10 +99,9 @@ export class PlanViewerComponent implements OnInit, OnDestroy {
     Object: any;
 
     constructor(
-        private cdr: ChangeDetectorRef,
-        private planService: PlanService,
-        private messageService: MessageService,
-        private route: ActivatedRoute
+        private readonly planService: PlanService,
+        private readonly messageService: MessageService,
+        private readonly route: ActivatedRoute
     ) {}
 
     ngOnInit(): void {
@@ -126,7 +123,9 @@ export class PlanViewerComponent implements OnInit, OnDestroy {
         });
     }
 
-    ngOnDestroy(): void {}
+    ngOnDestroy(): void {
+        /* TODO document why this method 'ngOnDestroy' is empty */
+    }
 
     isBasicPlan(plan: any): plan is BasicPlan {
         return 'workouts' in plan && !('diets' in plan) && !('nutrition' in plan);
@@ -210,7 +209,7 @@ export class PlanViewerComponent implements OnInit, OnDestroy {
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Error',
-                    detail: err.error.message || 'Failed to load plan',
+                    detail: err.error.message ?? 'Failed to load plan',
                     life: 5000
                 });
                 console.error(err.error);

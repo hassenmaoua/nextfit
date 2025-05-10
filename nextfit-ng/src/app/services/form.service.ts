@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { BehaviorSubject, filter, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { FormSectionConfig } from '../models/form-builder/form-config.model';
 import { PlanLevel } from '../models/plan';
 import { personalSectionConfig } from './data';
 import { basicConfig } from '../core/basic-form.config';
 import { mealConfig } from '../core/meal-form.config';
-import { basicPreferencesConfig } from '../core/basic-preferences.config';
-import { mealPreferencesConfig } from '../core/meal-preferences.config';
 import { FieldService } from './field.service';
 import { AuthService } from '../auth/services/auth.service';
 import { UserDTO } from '../auth/models/user.model';
@@ -16,9 +14,9 @@ import { UserDTO } from '../auth/models/user.model';
     providedIn: 'root'
 })
 export class FormService {
-    private isLoading$ = new BehaviorSubject<boolean>(false);
-    private currentPhrase$ = new BehaviorSubject<string>('');
-    private phrases = [
+    private readonly isLoading$ = new BehaviorSubject<boolean>(false);
+    private readonly currentPhrase$ = new BehaviorSubject<string>('');
+    private readonly phrases = [
         'Analyzing your fitness profile',
         'Designing personalized exercises',
         'Optimizing workout intensity',
@@ -37,9 +35,9 @@ export class FormService {
     private index = 0;
 
     constructor(
-        private fb: FormBuilder,
-        private fieldService: FieldService,
-        private authService: AuthService
+        private readonly fb: FormBuilder,
+        private readonly fieldService: FieldService,
+        private readonly authService: AuthService
     ) {}
 
     isUserKey(key: string, user: UserDTO): key is keyof UserDTO {
@@ -89,7 +87,7 @@ export class FormService {
         steps.forEach((step) => {
             step.fields.forEach((field) => {
                 const validators = this.fieldService.getValidators(field);
-                group[field.fieldName] = [field.defaultValue || null, validators];
+                group[field.fieldName] = [field.defaultValue ?? null, validators];
             });
         });
 

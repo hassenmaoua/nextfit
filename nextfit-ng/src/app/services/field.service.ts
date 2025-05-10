@@ -6,14 +6,14 @@ import { FieldConfig } from '../models/form-builder/form-config.model';
     providedIn: 'root'
 })
 export class FieldService {
-    constructor(private fb: FormBuilder) {}
+    constructor(private readonly fb: FormBuilder) {}
 
     createFormGroup(fields: FieldConfig[]): FormGroup {
         const group: { [key: string]: any } = {};
 
         fields.forEach((field) => {
             const validators = this.getValidators(field);
-            group[field.fieldName] = [field.defaultValue || null, validators];
+            group[field.fieldName] = [field.defaultValue ?? null, validators];
         });
 
         return this.fb.group(group);

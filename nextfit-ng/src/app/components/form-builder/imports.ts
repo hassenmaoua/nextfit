@@ -1,8 +1,7 @@
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FluidModule } from 'primeng/fluid';
-import { ReactiveFormsModule } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
 import { PanelModule } from 'primeng/panel';
 import { ProgressSpinner } from 'primeng/progressspinner';

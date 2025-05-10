@@ -45,7 +45,7 @@
             <div class="flex items-center">
                 <p-checkbox id="terms" formControlName="rememberMe" binary></p-checkbox>
                 <label for="terms" class="ms-2 text-surface-900 dark:text-surface-0 font-medium"> I have read the </label>
-                <p-button label="Terms and Conditions" styleClass="pl-0" [link]="true" (click)="showTerms()" />
+                <p-button label="Terms and Conditions" styleClass="pl-0" [link]="true" (onClick)="showTerms()" />
             </div>
             <small *ngIf="!f['rememberMe'].value && f['rememberMe'].touched" class="p-error">You must agree to the terms</small>
         </div>

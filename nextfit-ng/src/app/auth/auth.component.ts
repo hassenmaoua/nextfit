@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { Dialog } from 'primeng/dialog';
@@ -37,10 +37,10 @@ import { filter } from 'rxjs';
     `
 })
 export class AuthComponent {
-    private authService = inject(AuthService);
+    private readonly authService = inject(AuthService);
     routeKey = 0;
 
-    constructor(private router: Router) {
+    constructor(private readonly router: Router) {
         this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
             this.routeKey++; // changes the key to force reload
         });

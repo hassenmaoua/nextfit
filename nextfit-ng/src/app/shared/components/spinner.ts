@@ -1,7 +1,7 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { LoadingService, LoadingType } from '../services/loading.service';
-import { interval, map, Observable } from 'rxjs';
+import { LoadingService } from '../services/loading.service';
+import { Observable } from 'rxjs';
 import { ProgressSpinner } from 'primeng/progressspinner';
 
 @Component({
@@ -33,7 +33,7 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 export class Spinner {
     isVisible$: Observable<boolean>;
 
-    constructor(private loadingService: LoadingService) {
+    constructor(private readonly loadingService: LoadingService) {
         this.isVisible$ = this.loadingService.getLoadingStatus();
     }
 }

@@ -32,13 +32,13 @@ export class FormBuilderComponent implements OnInit {
     isLoading$: Observable<boolean> | undefined;
 
     constructor(
-        private formService: FormService,
-        private messageService: MessageService,
-        private confirmationService: ConfirmationService,
-        private planService: PlanService,
-        private router: Router,
-        private route: ActivatedRoute,
-        private menuSerivce: MenuService
+        private readonly formService: FormService,
+        private readonly messageService: MessageService,
+        private readonly confirmationService: ConfirmationService,
+        private readonly planService: PlanService,
+        private readonly router: Router,
+        private readonly route: ActivatedRoute,
+        private readonly menuSerivce: MenuService
     ) {}
 
     ngOnInit() {
@@ -46,7 +46,7 @@ export class FormBuilderComponent implements OnInit {
 
         // Validate the query parameter
         this.route.queryParams.subscribe((params: Params) => {
-            const planParam = params['plan'] || PlanLevel.BASIC;
+            const planParam = params['plan'] ?? PlanLevel.BASIC;
 
             if (planParam) {
                 // Check if the param is a valid PlanLevel value
@@ -78,6 +78,7 @@ export class FormBuilderComponent implements OnInit {
             this.config = config;
             this.form = this.formService.createFormGroup(this.config);
         } catch (err) {
+            console.error(err);
             this.messageService.add({
                 severity: 'error',
                 summary: 'Error',
@@ -158,7 +159,7 @@ export class FormBuilderComponent implements OnInit {
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Error',
-                    detail: err?.error?.error || 'Failed to generate plan. Please try again.',
+                    detail: err?.error?.error ?? 'Failed to generate plan. Please try again.',
                     life: 5000
                 });
                 this.formService.stopLoading();
@@ -194,10 +195,7 @@ export class FormBuilderComponent implements OnInit {
     }
 
     isFieldVisible(field: FieldConfig): boolean {
-        if (!this.form || !this.form.controls[field.fieldName]) {
-            return false;
-        }
-        return true;
+        return !!this.form?.controls[field.fieldName];
     }
 
     confirm() {

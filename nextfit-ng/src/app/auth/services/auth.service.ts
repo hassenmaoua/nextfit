@@ -6,7 +6,7 @@ import { UserDTO } from '../models/user.model';
 import { Router } from '@angular/router';
 import { AuthHTTPService } from './auth-http.service';
 import { AuthModel } from '../models/auth.model';
-import { layoutConfig } from '../../layout/service/layout.service';
+import { LayoutConfig } from '../../layout/service/layout.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
 import { UserService } from '../../services/user.service';
@@ -17,8 +17,8 @@ import { UpdateProfileRequest } from '../../models/requests/update-profile-reque
 })
 export class AuthService implements OnDestroy {
     // private fields
-    private unsubscribe: Subscription[] = [];
-    private authStorageToken = `${environment.appVersion}-${environment.USERDATA_KEY}`;
+    private readonly unsubscribe: Subscription[] = [];
+    private readonly authStorageToken = `${environment.appVersion}-${environment.USERDATA_KEY}`;
 
     // public fields
     currentUser$: Observable<UserDTO | undefined>;
@@ -41,10 +41,10 @@ export class AuthService implements OnDestroy {
     }
 
     constructor(
-        private authHttpService: AuthHTTPService,
-        private userService: UserService,
-        private router: Router,
-        private cookieService: CookieService
+        private readonly authHttpService: AuthHTTPService,
+        private readonly userService: UserService,
+        private readonly router: Router,
+        private readonly cookieService: CookieService
     ) {
         this.currentUser$ = this.currentUserSubject.asObservable();
         this.isLoading$ = this.isLoadingSubject.asObservable();
@@ -59,9 +59,9 @@ export class AuthService implements OnDestroy {
                     if (staySignedIn) {
                         const expiryDate = new Date();
                         expiryDate.setDate(expiryDate.getDate() + 7);
-                        this.cookieService.set(this.authStorageToken, auth?.authToken, { expires: expiryDate, path: '/', secure: true, sameSite: 'Lax' });
+                        this.cookieService.set(this.authStorageToken, auth?.authToken, { expires: expiryDate, path: '/', sameSite: 'Lax' });
                     } else {
-                        this.cookieService.set(this.authStorageToken, auth?.authToken, { path: '/', secure: true, sameSite: 'Lax' });
+                        this.cookieService.set(this.authStorageToken, auth?.authToken, { path: '/', sameSite: 'Lax' });
                     }
                 }
             }),
@@ -118,17 +118,15 @@ export class AuthService implements OnDestroy {
         }
     }
 
-    updateLayout(layoutConfig: layoutConfig) {
-        if (!layoutConfig.id) {
-            layoutConfig.id = this.currentUser?.config.id;
-        }
+    updateLayout(layoutConfig: LayoutConfig) {
+        layoutConfig.id ??= this.currentUser?.config.id;
 
         this.isLoadingSubject.next(true);
 
         this.authHttpService
             .updateLayout(layoutConfig)
             .pipe(
-                map((res: layoutConfig) => {
+                map((res: LayoutConfig) => {
                     localStorage.setItem('config', JSON.stringify(res));
                     return res;
                 }),
@@ -148,7 +146,7 @@ export class AuthService implements OnDestroy {
         return this.authHttpService.createUser({ email, password }).pipe(
             map((response) => response),
             catchError((err: HttpErrorResponse) => {
-                const message = err?.error?.message || 'Unknown error during registration';
+                const message = err?.error?.message ?? 'Unknown error during registration';
                 return throwError(() => new Error(message)); // propagate error as Error
             }),
             finalize(() => this.isLoadingSubject.next(false))
