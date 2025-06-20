@@ -40,7 +40,7 @@ Robust and scalable Java backend built with:
 next-fit/
 ├── nextfit-ng/           # Angular frontend application
 ├── nextfit-backend/      # Spring Boot backend API
-├── docker/               # Docker setup for both frontend an backend
+├── docker-compose/       # Docker setup for both frontend an backend
 ├── jenkinsfile           # Jenkins CI/CD pipeline configuration
 ├── README.md             # Project overview and setup
 ```
