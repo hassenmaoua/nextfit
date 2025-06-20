@@ -1,8 +1,6 @@
 services:
   frontend:
-    build:
-      context: ../nextfit-ng
-      dockerfile: ../nextfit-ng/Dockerfile
+    build: ./nextfit-ng
     ports:
       - "4200:80"
     depends_on:
@@ -11,9 +9,7 @@ services:
       - spring-demo
 
   backend:
-    build:
-      context: ../nextfit-backend
-      dockerfile: ../nextfit-backend/Dockerfile
+    build: ./nextfit-backend
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/nextfit?useSSL=false&allowPublicKeyRetrieval=true
